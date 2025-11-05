@@ -1,0 +1,11 @@
+[pyprland]
+plugins = ["scratchpads"]
+
+[scratchpads.ephemeral-kitty]
+animation = ""
+command = "kitty --class ephemeral-kitty"
+class = "ephemeral-kitty"
+size = "30% 30%"
+unfocus = "hide"
+hysteresis = 0
+close_on_hide = true
