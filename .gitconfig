@@ -1,0 +1,11 @@
+[user]
+	name = Jan Cernik
+	email = jancernik12@gmail.com
+[init]
+	defaultBranch = main
+[pull]
+	rebase = false
+[color]
+	ui = auto
+[core]
+	editor = code --wait

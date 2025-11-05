@@ -1,0 +1,37 @@
+#panels-container {
+  width: 0px !important;
+  border: none !important;
+}
+
+.panel-group {
+  right: 0px !important;
+}
+
+[title^="Page offers feeds"],
+.ContentBlocker-Control {
+  display: none !important;
+}
+
+#browser.popup .bookmark-bar {
+  display: none;
+}
+
+#browser.popup .mainbar {
+  display: none;
+}
+
+#browser.popup #panels-container {
+  display: none;
+}
+
+#browser.popup .tabbar-wrapper {
+  display: none;
+}
+
+#browser.popup .toolbar.toolbar-droptarget.toolbar-statusbar.toolbar-medium {
+  display: none;
+}
+
+#browser.popup .menubar.horizontal {
+  display: none;
+}

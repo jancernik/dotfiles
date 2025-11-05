@@ -1,0 +1,23 @@
+{
+   "accentFromPage": false,
+   "accentOnWindow": true,
+   "accentSaturationLimit": 1,
+   "alpha": 0.9,
+   "blur": 5,
+   "colorAccentBg": "#000000",
+   "colorBg": "#202124",
+   "colorFg": "#bfbfbf",
+   "colorHighlightBg": "#bfbfbf",
+   "colorWindowBg": "",
+   "contrast": 3,
+   "dimBlurred": false,
+   "engineVersion": 1,
+   "id": "6892db2c-db90-4202-90e0-f1d9babff542",
+   "name": "Black Theme",
+   "preferSystemAccent": false,
+   "radius": 6,
+   "simpleScrollbar": false,
+   "transparencyTabBar": false,
+   "transparencyTabs": true,
+   "version": 2
+}
