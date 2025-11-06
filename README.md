@@ -1,6 +1,6 @@
 # dotfiles
 
-<small>The never-ending dotfiles...</small>
+<sub>The never-ending dotfiles...</sub>
 
 This repo contains most of the config and scripts I use on my current machine.
 It's meant as a fresh start, created right after my latest Linux install, and aims to be my dream custom, clean, tidy, and long-lasting workstation setup.
