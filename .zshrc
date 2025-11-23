@@ -61,3 +61,9 @@ esac
 ## Completion scripts setup. Remove the following line to uninstall
 [[ -f /home/jan/.config/.dart-cli-completion/zsh-config.zsh ]] && . /home/jan/.config/.dart-cli-completion/zsh-config.zsh || true
 ## [/Completion]
+
+# rbenv
+export RBENV_ROOT="$HOME/.rbenv"
+export PATH="$RBENV_ROOT/bin:$PATH"
+eval "$(rbenv init - zsh)"
+
