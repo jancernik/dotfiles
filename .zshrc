@@ -62,8 +62,7 @@ esac
 [[ -f /home/jan/.config/.dart-cli-completion/zsh-config.zsh ]] && . /home/jan/.config/.dart-cli-completion/zsh-config.zsh || true
 ## [/Completion]
 
-# rbenv
-export RBENV_ROOT="$HOME/.rbenv"
-export PATH="$RBENV_ROOT/bin:$PATH"
-eval "$(rbenv init - zsh)"
+export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
 
+fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
+autoload -Uz compinit && compinit
