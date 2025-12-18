@@ -45,6 +45,7 @@ fi
 "'
 
 export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -l -g ""'
+export MANPAGER="bat -plman"
 
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -64,6 +65,5 @@ esac
 ## [/Completion]
 
 export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
-
 fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
 autoload -Uz compinit && compinit
