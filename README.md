@@ -33,3 +33,7 @@ Since I use an NVIDIA graphics card as my main one, I could have a Windows VM th
 
 Many people advise against it since it's pretty tricky stuff, but still, the success stories lured me in anyway. Sadly, I tried for several days to do it myself, but for the life of me I couldn't get it working. I always ended up with the famous Code 43.
 So for now, I'm letting that rest, and I'll try again when I have more time.
+
+```bash
+chezmoi init --apply --verbose https://github.com/jancernik/dotfiles.git
+```
