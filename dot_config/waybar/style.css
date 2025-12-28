@@ -33,9 +33,8 @@ tooltip {
   border-radius: 50%;
 }
 
-#workspaces button.hover,
 #workspaces button.active {
-  color: #aaa;
+  color: #ccc;
 }
 
 #clock {
