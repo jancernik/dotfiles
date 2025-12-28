@@ -86,6 +86,7 @@ input {
     follow_mouse = 1
     float_switch_override_focus = 0
     sensitivity = -0.6
+    force_no_accel = 0
 }
 
 plugin {
@@ -96,3 +97,11 @@ plugin {
         enable_persistent_workspaces = 1
     }
 }
+
+{{ if eq .chezmoi.hostname "arch-laptop" -}}
+device {
+    name = asue140d:00-04f3:31b9-touchpad
+    sensitivity = -0.2
+    natural_scroll = true
+}
+{{- end -}}
