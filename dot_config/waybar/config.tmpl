@@ -1,10 +1,16 @@
 {
   "layer": "top",
   "position": "top",
-  "mod": "dock",
+  "mod": "dock",  
+{{- if eq .chezmoi.hostname "arch-desktop" }}
   "margin-left": 12,
   "margin-right": 12,
   "margin-top": 12,
+{{- else if eq .chezmoi.hostname "arch-laptop" }}
+  "margin-left": 6,
+  "margin-right": 6,
+  "margin-top": 6,
+{{- end }}
   "spacing": 2,
   "margin-bottom": 0,
   "exclusive": true,
