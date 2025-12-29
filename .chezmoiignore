@@ -1,2 +1,5 @@
 **/*.env
 README.md
+
+**/micro/backups
+**/micro/buffers
