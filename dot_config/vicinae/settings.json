@@ -1,0 +1,14 @@
+{
+  "close_on_focus_loss": true,
+  "pop_to_root_on_close": true,
+  "launcher_window": {
+    "opacity": 0.6,
+    "blur": {
+      "enabled": false
+    },
+    "dim_around": false,
+    "compact_mode": {
+      "enabled": false
+    }
+  }
+}
