@@ -8,3 +8,9 @@ $browser = brave
 $whatsapp = brave --new-window --app=https://web.whatsapp.com
 $obsidian = obsidian --disable-gpu
 $lock = hyprlock
+
+{{ if eq .chezmoi.hostname "arch-desktop" -}}
+$inital_workspace = 6
+{{ else if eq .chezmoi.hostname "arch-laptop" -}}
+$inital_workspace = 1
+{{- end -}}
