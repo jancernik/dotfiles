@@ -1,5 +1,13 @@
 $font = 'JetBrains Mono Nerd Font'
 
+{{ if eq .chezmoi.hostname "arch-desktop" -}}
+$monitor = DP-2
+$background = ~/Pictures/Wallpapers/teal-orange-blur.jpg
+{{ else if eq .chezmoi.hostname "arch-laptop" -}}
+$monitor = eDP-1
+$background = ~/Pictures/Wallpapers/cyan-blur.jpg
+{{- end }}
+
 general {
     hide_cursor = true
     fail_timeout = 0
@@ -17,13 +25,12 @@ animations {
 
 background {
     monitor =
-    path = ~/Pictures/Wallpapers/teal-orange-blur.jpg
+    path = $background
     blur_passes = 3
 }
 
-
 image {
-    monitor = DP-2
+    monitor = $monitor
     path = ~/Pictures/profile.jpg
     size = 140
     position = 0, 114
@@ -33,7 +40,7 @@ image {
 }
 
 label {
-    monitor = DP-2
+    monitor = $monitor
     text = Jan Cernik
     font_size = 15
     onclick = hyprctl switchxkblayout all next
@@ -47,7 +54,7 @@ label {
 
 
 input-field {
-    monitor = DP-2
+    monitor = $monitor
     size = 280, 44
     rounding = 24
     outline_thickness = 0

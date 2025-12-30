@@ -4,22 +4,38 @@ general {
     after_sleep_cmd = hyprctl dispatch dpms on  # to avoid having to press a key twice to turn on the display.
 }
 
+{{ if eq .chezmoi.hostname "arch-desktop" -}}
 listener {
     timeout = 300
     on-timeout = ~/.scripts/brightness.sh save && ~/.scripts/brightness.sh 0
     on-resume = ~/.scripts/brightness.sh restore
 }
+{{ else if eq .chezmoi.hostname "arch-laptop" -}}
+listener {
+    timeout = 300
+    on-timeout = brightnessctl --save && brightnessctl set 15
+    on-resume = brightnessctl --restore
+}
+{{- end }}
 
 listener {
     timeout = 600
     on-timeout = loginctl lock-session
 }
 
+{{ if eq .chezmoi.hostname "arch-desktop" -}}
 listener {
     timeout = 900
     on-timeout = hyprctl dispatch dpms off
     on-resume = hyprctl dispatch dpms on && ~/.scripts/brightness.sh restore
 }
+{{ else if eq .chezmoi.hostname "arch-laptop" -}}
+listener {
+    timeout = 900
+    on-timeout = hyprctl dispatch dpms off
+    on-resume = hyprctl dispatch dpms on && brightnessctl --restore
+}
+{{- end }}
 
 listener {
     timeout = 1800
