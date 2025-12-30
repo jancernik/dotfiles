@@ -23,7 +23,7 @@
   "modules-center": [
     "clock"
   ],
-  "modules-right": [],
+  "modules-right": ["wireplumber#source"],
   "hyprland/workspaces": {
     "format": "{icon}",
     "format-icons": {
@@ -37,5 +37,13 @@
   },
   "clock": {
     "format-alt": "{:%a, %d. %b  %H:%M}"
-  }
+  },
+  "wireplumber#source": {
+      "node-type": "Audio/Source",
+      "format": "{volume}% 󰍬",
+      "format-muted": "󰍭",
+      "on-click": "./scripts/audio_picker.sh --source",
+      "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
+      "scroll-step": 5,
+  },
 }
