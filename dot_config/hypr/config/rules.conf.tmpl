@@ -3,6 +3,14 @@ windowrule = workspace special:magic silent, no_initial_focus on, match:class ^(
 windowrule = float on, size 380 600, center on, match:class ^(brave-nngceckbapebfimnlniiiahkandclblb-Default)$ # Bitwarden
 windowrule = float on, size 300 616, center on, match:class ^(org.gnome.Calculator)$
 windowrule = float on, match:class ^(qimgv)$
+windowrule = float on, match:initial_class ^(ephemeral-kitty)$
+
+{{- if eq .chezmoi.hostname "arch-desktop" }}
+windowrule = move (monitor_w-window_w-27) 91, border_size 0, match:class ^(wofi)$
+{{- else if eq .chezmoi.hostname "arch-laptop" }}
+windowrule = move (monitor_w-window_w-27) 70, border_size 0, match:class ^(wofi)$
+{{- end }}
+windowrule = border_size 0, match:class ^(vicinae)$
 
 layerrule = blur on, ignore_alpha 0,  match:namespace vicinae
 layerrule = blur on, ignore_alpha 0, match:namespace waybar
