@@ -87,11 +87,32 @@ menu_input="$(
 	done
 )"
 
-chosen_id="$(
+if [[ -n "$default_index" ]]; then
+	new_ids=("${node_ids[$default_index]}")
+	new_names=("${node_names[$default_index]}")
+	for i in "${!node_ids[@]}"; do
+		[[ "$i" == "$default_index" ]] && continue
+		new_ids+=("${node_ids[$i]}")
+		new_names+=("${node_names[$i]}")
+	done
+	node_ids=("${new_ids[@]}")
+	node_names=("${new_names[@]}")
+fi
+
+menu_input="$(printf '%s\n' "${node_names[@]}")"
+lines="${#node_names[@]}"
+
+chosen_index="$(
 	printf '%s' "$menu_input" |
-		fuzzel --dmenu -a top --minimal-lines --hide-prompt \
-			--with-nth=2 --accept-nth=1 \
-			${default_index:+--select-index="$default_index"}
+		wofi --dmenu --normal-window \
+			--width 320 \
+			--lines "$lines" \
+			--hide-scroll \
+			--hide-search \
+			--define 'dmenu-print_line_num=true' \
+			--define 'single_click=true'
 )"
 
-[[ -n "${chosen_id:-}" ]] && wpctl set-default "$chosen_id"
+if [[ -n "${chosen_index:-}" && "$chosen_index" =~ ^[0-9]+$ ]] && ((chosen_index < ${#node_ids[@]})); then
+	wpctl set-default "${node_ids[$chosen_index]}"
+fi
