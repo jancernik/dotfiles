@@ -1,7 +1,10 @@
 {
-  "close_on_focus_loss": true,
   "pop_to_root_on_close": true,
+  "close_on_focus_loss": true,
   "launcher_window": {
+    "layer_shell": {
+      "enabled": false
+    },
     "opacity": 0.6,
     "blur": {
       "enabled": false

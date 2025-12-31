@@ -7,9 +7,6 @@ IFS=$' \t\n'
 shopt -s extglob
 
 TARGET_CLASS="${TARGET_CLASS:-vicinae}"
-FOLLOW_DEFAULT="${FOLLOW_DEFAULT:-1}"
-FOLLOW_WITH_TARGET="${FOLLOW_WITH_TARGET:-2}"
-
 SOCK="$XDG_RUNTIME_DIR/hypr/${HYPRLAND_INSTANCE_SIGNATURE}/.socket2.sock"
 
 normalize_addr() {
@@ -24,25 +21,23 @@ normalize_addr() {
 parse_openwindow() {
 	local payload="$1"
 	if [[ "$payload" == *:* ]]; then
-		local addr cls title
+		local addr cls
 		addr="$(sed -n 's/.*address:\([^,]*\).*/\1/p' <<<"$payload")"
 		cls="$(sed -n 's/.*class:\([^,]*\).*/\1/p' <<<"$payload")"
-		title="$(sed -n 's/.*title:\([^,]*\).*/\1/p' <<<"$payload")"
-		printf '%s\t%s\t%s\n' "$addr" "$cls" "$title"
+		printf '%s\t%s\n' "$addr" "$cls"
 	else
-		local addr rest cls title
+		local addr rest cls
 		addr="${payload%%,*}"
 		rest="${payload#*,}"
 		rest="${rest#*,}"
 		cls="${rest%%,*}"
-		title="${rest#*,}"
-		printf '%s\t%s\t%s\n' "$addr" "$cls" "$title"
+		printf '%s\t%s\n' "$addr" "$cls"
 	fi
 }
 
 get_follow_mouse() {
-	hyprctl getoption input:follow_mouse -j 2>/dev/null |
-		sed -n 's/.*"int":[[:space:]]*\([0-9]\+\).*/\1/p' | head -n1
+	hyprctl getoption input:follow_mouse 2>/dev/null |
+		awk -F': *' '$1=="int"{print $2; exit}'
 }
 
 set_follow_mouse() {
@@ -50,18 +45,17 @@ set_follow_mouse() {
 }
 
 declare -A TARGET_ADDRS=()
+SAVED_FOLLOW_MOUSE=""
 
 update_follow_mouse() {
-	local desired current
 	if ((${#TARGET_ADDRS[@]} > 0)); then
-		desired="$FOLLOW_WITH_TARGET"
+		[[ -n "$SAVED_FOLLOW_MOUSE" ]] || SAVED_FOLLOW_MOUSE="$(get_follow_mouse || true)"
+		set_follow_mouse 0
 	else
-		desired="$FOLLOW_DEFAULT"
+		[[ -n "$SAVED_FOLLOW_MOUSE" ]] || return 0
+		set_follow_mouse "$SAVED_FOLLOW_MOUSE"
+		SAVED_FOLLOW_MOUSE=""
 	fi
-
-	current="$(get_follow_mouse)"
-	[[ -n "${current:-}" && "$current" == "$desired" ]] && return 0
-	set_follow_mouse "$desired"
 }
 
 initial_sync() {
