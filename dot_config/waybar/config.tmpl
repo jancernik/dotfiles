@@ -3,13 +3,13 @@
   "position": "top",
   "mod": "dock",  
 {{- if eq .chezmoi.hostname "arch-desktop" }}
-  "margin-left": 12,
-  "margin-right": 12,
-  "margin-top": 12,
+  "margin-left": 15,
+  "margin-right": 15,
+  "margin-top": 15,
 {{- else if eq .chezmoi.hostname "arch-laptop" }}
-  "margin-left": 6,
-  "margin-right": 6,
-  "margin-top": 6,
+  "margin-left": 8,
+  "margin-right": 8,
+  "margin-top": 8,
 {{- end }}
   "spacing": 2,
   "margin-bottom": 0,
@@ -23,7 +23,7 @@
   "modules-center": [
     "clock"
   ],
-  "modules-right": ["wireplumber#source"],
+  "modules-right": ["wireplumber#sink", "wireplumber#source"],
   "hyprland/workspaces": {
     "format": "{icon}",
     "format-icons": {
@@ -40,10 +40,18 @@
   },
   "wireplumber#source": {
       "node-type": "Audio/Source",
-      "format": "{volume}% 󰍬",
+      "format": "󰍬  {volume}%",
       "format-muted": "󰍭",
-      "on-click": "./scripts/audio_picker.sh --source",
-      "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
+      "on-click": "/home/jan/.config/waybar/scripts/audio_picker.sh --source",
       "scroll-step": 5,
   },
+  "wireplumber#sink": {
+	   "format": "{volume}%",
+	   "format-muted": "",
+	   "on-click": "helvum",
+	   "format": "{icon} {volume}%",
+	   "format-icons": ["  ", "  ", "  "],
+	   "on-click": "/home/jan/.config/waybar/scripts/audio_picker.sh --sink",
+	   "scroll-step": 5
+  }
 }
