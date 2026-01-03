@@ -1,20 +1,18 @@
+# PATH
 export PATH="$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH"
 export PATH="$HOME/go/bin:$PATH"
 
-source "$HOME/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh"
-source "$HOME/.config/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
-source "$HOME/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh"
+# Prompt
+eval "$(oh-my-posh init zsh --config ~/.config/ohmyposh/theme.toml)"
 
-source <(fzf --zsh)
-
+# Editor
 if [[ -n $SSH_CONNECTION ]]; then
   export EDITOR='nano'
 else
   export EDITOR='micro'
 fi
 
-eval "$(oh-my-posh init zsh --config ~/.config/ohmyposh/theme.toml)"
-
+# Keybindings
 bindkey -e
 bindkey '^[[1;5D' backward-word
 bindkey '^[[1;5C' forward-word
@@ -23,6 +21,7 @@ bindkey '^[[5C' forward-word
 bindkey '^[[1;3D' backward-word
 bindkey '^[[1;3C' forward-word
 
+# Aliases
 alias i="yay -S"
 alias b="~/.scripts/brightness.sh"
 alias m="~/.scripts/monitor-backlight.sh"
@@ -42,31 +41,73 @@ else
 fi
 "'
 
+# FZF
 export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -l -g ""'
+if command -v fzf >/dev/null 2>&1; then
+  FZF_ZSH_INIT="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/fzf.zsh"
+  mkdir -p "${FZF_ZSH_INIT:h}"
+  if [[ ! -r "$FZF_ZSH_INIT" ]]; then
+    fzf --zsh >| "$FZF_ZSH_INIT"
+  fi
+  source "$FZF_ZSH_INIT"
+fi
+
+# Pager
 export MANPAGER="bat -plman"
 
+# Node (nvm lazy-load)
 export NVM_DIR="$HOME/.config/nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+_nvm_lazy_load() {
+  unfunction nvm node npm npx pnpm corepack 2>/dev/null || true
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" --no-use
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+  nvm use --silent default >/dev/null 2>&1 || true
+}
+nvm() { _nvm_lazy_load; nvm "$@"; }
+node() { _nvm_lazy_load; command node "$@"; }
+npm() { _nvm_lazy_load; command npm "$@"; }
+npx() { _nvm_lazy_load; command npx "$@"; }
+corepack() { _nvm_lazy_load; command corepack "$@"; }
+pnpm() { _nvm_lazy_load; command pnpm "$@"; }
 
 # pnpm
-export PNPM_HOME="/home/jan/.local/share/pnpm"
+export PNPM_HOME="$HOME/.local/share/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
-# pnpm end
 
-## [Completion]
-## Completion scripts setup. Remove the following line to uninstall
-[[ -f /home/jan/.config/.dart-cli-completion/zsh-config.zsh ]] && . /home/jan/.config/.dart-cli-completion/zsh-config.zsh || true
-## [/Completion]
+# Dart completion
+[[ -f "$HOME/.config/.dart-cli-completion/zsh-config.zsh" ]] && . "$HOME/.config/.dart-cli-completion/zsh-config.zsh" || true
 
+# asdf
 export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
 fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
 
+# Completion (compinit + fzf-tab)
+zmodload -i zsh/complist
+
+ZSH_COMPDUMP="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-${ZSH_VERSION}"
+mkdir -p "${ZSH_COMPDUMP:h}"
+autoload -Uz compinit
+if [[ ! -f "$ZSH_COMPDUMP" || -n ${ZSH_COMPDUMP}(#qN.mh+24) ]]; then
+  compinit -d "$ZSH_COMPDUMP"
+else
+  compinit -C -d "$ZSH_COMPDUMP"
+fi
+
+source "$HOME/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh"
+
+# Plugins (widget wrappers)
+source "$HOME/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh"
+source "$HOME/.config/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
+
+# Atuin
 source "$HOME/.atuin/bin/env"
 eval "$(atuin init zsh --disable-up-arrow)"
-fc -R =(atuin search --cmd-only --limit 100)
-
-autoload -Uz compinit && compinit
+ATUIN_IMPORT_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/atuin-imported"
+mkdir -p "${ATUIN_IMPORT_CACHE:h}"
+if [[ ! -f "$ATUIN_IMPORT_CACHE" || -n ${ATUIN_IMPORT_CACHE}(#qN.mh+24) ]]; then
+  fc -R =(atuin search --cmd-only --limit 100)
+  : >| "$ATUIN_IMPORT_CACHE"
+fi
