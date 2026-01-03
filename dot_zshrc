@@ -24,6 +24,14 @@ bindkey '^[[5C' forward-word
 bindkey '^[[1;3D' backward-word
 bindkey '^[[1;3C' forward-word
 
+autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey '^[[A'  up-line-or-beginning-search
+bindkey '^[[B'  down-line-or-beginning-search
+bindkey '^[OA'  up-line-or-beginning-search
+bindkey '^[OB'  down-line-or-beginning-search
+
 # Aliases
 alias i="yay -S"
 alias b="~/.scripts/brightness.sh"
@@ -108,9 +116,4 @@ source "$HOME/.config/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlight
 # Atuin
 source "$HOME/.atuin/bin/env"
 eval "$(atuin init zsh --disable-up-arrow)"
-ATUIN_IMPORT_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/atuin-imported"
-mkdir -p "${ATUIN_IMPORT_CACHE:h}"
-if [[ ! -f "$ATUIN_IMPORT_CACHE" || -n ${ATUIN_IMPORT_CACHE}(#qN.mh+24) ]]; then
-  fc -R =(atuin search --cmd-only --limit 100)
-  : >| "$ATUIN_IMPORT_CACHE"
-fi
+fc -R =(atuin search --cmd-only --limit 200)
