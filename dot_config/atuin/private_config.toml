@@ -1,6 +1,6 @@
 update_check = true
 auto_sync = true
-sync_frequency = "10m"
+sync_frequency = "5m"
 sync_address = "https://atuin.cuasar.cc"
 
 style = "full"
@@ -17,3 +17,6 @@ scroll_exits = false
 
 [sync]
 records = true
+
+[theme]
+name = "custom-theme"

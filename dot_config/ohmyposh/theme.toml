@@ -33,16 +33,6 @@ fetch_status = true
 type = 'rprompt'
 overflow = 'hidden'
 
-[[blocks.segments]]
-type = 'executiontime'
-style = 'plain'
-foreground = 'yellow'
-background = 'transparent'
-template = '{{ .FormattedMs }}'
-
-[blocks.segments.properties]
-threshold = 5000
-
 [[blocks]]
 type = 'prompt'
 alignment = 'left'

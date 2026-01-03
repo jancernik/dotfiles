@@ -107,9 +107,13 @@ else
   compinit -C -d "$ZSH_COMPDUMP"
 fi
 
-source "$HOME/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh"
+# fzf-tab
+zstyle ':fzf-tab:*' fzf-flags \
+  --info=hidden \
+  --color=pointer:#BABBF1,marker:#BABBF1,hl:#80A1EF,hl+:#80A1EF
 
-# Plugins (widget wrappers)
+# Plugins
+source "$HOME/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh"
 source "$HOME/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh"
 source "$HOME/.config/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
 

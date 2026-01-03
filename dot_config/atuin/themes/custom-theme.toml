@@ -1,0 +1,9 @@
+[theme]
+name = "custom-theme"
+parent = ""
+
+[colors]
+Title = "#BABBF1"
+Important = "#BABBF1"
+Guidance = "#BABBF1"
+AlertError = "#80A1EF"
