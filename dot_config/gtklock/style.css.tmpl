@@ -1,0 +1,21 @@
+window {
+
+{{- if eq .chezmoi.hostname "arch-desktop" }}
+   background-image: url("/home/jan/Pictures/Wallpapers/teal-orange-blur.jpg");
+{{- else if eq .chezmoi.hostname "arch-laptop" }}
+   background-image: url("/home/jan/Pictures/Wallpapers/cyan-blur.jpg");
+{{- end }}
+
+   background-size: cover;
+   background-repeat: no-repeat;
+   background-position: center;
+   background-color: black;
+}
+
+window #window-box {
+  opacity: 0;
+}
+
+window#DP-2 #window-box, window#eDP-1 #window-box {
+  opacity: 1;
+}

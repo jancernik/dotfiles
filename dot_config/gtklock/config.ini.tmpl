@@ -1,0 +1,9 @@
+[main]
+start-hidden=true
+layout=/home/jan/.config/gtklock/layout.ui
+
+{{- if eq .chezmoi.hostname "arch-desktop" }}
+monitor-priority=DP-2
+{{- else if eq .chezmoi.hostname "arch-laptop" }}
+monitor-priority=eDP-1
+{{- end }}
