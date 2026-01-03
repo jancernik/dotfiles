@@ -12,6 +12,9 @@ else
   export EDITOR='micro'
 fi
 
+# Word boundaries
+WORDCHARS=${WORDCHARS//\/}
+
 # Keybindings
 bindkey -e
 bindkey '^[[1;5D' backward-word
