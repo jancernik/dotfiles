@@ -2,6 +2,9 @@
 export PATH="$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH"
 export PATH="$HOME/go/bin:$PATH"
 
+# Lazy loading
+source "$HOME/.config/zsh/plugins/zsh-defer/zsh-defer.plugin.zsh"
+
 # Prompt
 eval "$(oh-my-posh init zsh --config ~/.config/ohmyposh/theme.toml)"
 
@@ -67,19 +70,13 @@ fi
 export MANPAGER="bat -plman"
 
 # Node (nvm lazy-load)
-export NVM_DIR="$HOME/.config/nvm"
 _nvm_lazy_load() {
-  unfunction nvm node npm npx pnpm corepack 2>/dev/null || true
+  export NVM_DIR="$HOME/.config/nvm"
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" --no-use
   [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
   nvm use --silent default >/dev/null 2>&1 || true
 }
-nvm() { _nvm_lazy_load; nvm "$@"; }
-node() { _nvm_lazy_load; command node "$@"; }
-npm() { _nvm_lazy_load; command npm "$@"; }
-npx() { _nvm_lazy_load; command npx "$@"; }
-corepack() { _nvm_lazy_load; command corepack "$@"; }
-pnpm() { _nvm_lazy_load; command pnpm "$@"; }
+zsh-defer _nvm_lazy_load
 
 # pnpm
 export PNPM_HOME="$HOME/.local/share/pnpm"
