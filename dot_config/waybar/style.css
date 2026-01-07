@@ -37,8 +37,12 @@ tooltip {
   color: #ccc;
 }
 
+#battery {
+  padding-right: 10px;
+}
+
 #wireplumber.source {
-  padding-left: 15px;
+  padding-left: 10px;
   padding-right: 10px;
 }
 

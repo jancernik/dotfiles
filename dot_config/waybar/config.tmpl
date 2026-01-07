@@ -23,7 +23,7 @@
   "modules-center": [
     "clock"
   ],
-  "modules-right": ["wireplumber#sink", "wireplumber#source"],
+  "modules-right": ["wireplumber#sink", "wireplumber#source", "battery"],
   "hyprland/workspaces": {
     "format": "{icon}",
     "format-icons": {
@@ -37,6 +37,17 @@
   },
   "clock": {
     "format-alt": "{:%a, %d. %b  %H:%M}"
+  },
+  "battery": {
+      "bat": "BAT0",
+      "interval": 60,
+      "states": {
+          "warning": 30,
+          "critical": 15
+      },
+      "format": "{icon}   {capacity}%",
+      "format-icons": ["", "", "", "", ""],
+      "max-length": 25
   },
   "wireplumber#source": {
       "node-type": "Audio/Source",
