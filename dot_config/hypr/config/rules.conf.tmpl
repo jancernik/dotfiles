@@ -6,6 +6,7 @@ windowrule = float on, match:class ^(gjs)$
 windowrule = float on, match:class ^(qimgv)$
 windowrule = float on, match:initial_class ^(ephemeral-kitty)$
 windowrule = float off, match:class ^(steam)$
+windowrule = float off, size 1920 1080, center on, workspace 1 silent, match:class ^(puppeteer-browser)$
 
 {{- if eq .chezmoi.hostname "arch-desktop" }}
 windowrule = move (monitor_w-window_w-27) 91, border_size 0, match:class ^(wofi)$
@@ -16,6 +17,7 @@ windowrule = border_size 0, match:class ^(vicinae)$
 
 layerrule = blur on, ignore_alpha 0,  match:namespace vicinae
 layerrule = blur on, ignore_alpha 0, match:namespace waybar
+layerrule = blur on, ignore_alpha 0, match:namespace bar
 
 # Ignore maximize requests from apps
 windowrule = suppress_event maximize, match:class .*
