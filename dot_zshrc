@@ -115,6 +115,7 @@ zstyle ':fzf-tab:*' fzf-flags \
 source "$HOME/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh"
 source "$HOME/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh"
 source "$HOME/.config/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
+source "$HOME/.config/zsh/plugins/zsh-shift-select/zsh-shift-select.plugin.zsh"
 
 # Atuin
 source "$HOME/.atuin/bin/env"
