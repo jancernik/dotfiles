@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ "$1" == "--watch" ]]; then
+if [[ "$1" != "--watch" ]]; then
     active_address="$(hyprctl activewindow -j | jq -r '.address')"
     current_workspaces=$(hyprctl monitors -j | jq -r '.[] | .activeWorkspace.id')
 
@@ -16,4 +16,4 @@ if [[ "$1" == "--watch" ]]; then
     exit 0
 fi
 
-find "$HOME/.config/hypr" -type f | entr -r -n "$0" --watch
+find "$HOME/.config/hypr" -type f | entr -r -n "$0"
