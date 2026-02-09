@@ -21,6 +21,11 @@ bind = $mainMod, P, pseudo
 bind = $mainMod, J, togglesplit
 bind = $mainModShift, M, exit
 
+bind = $mainMod, F1, pass, class:^(com.obsproject.Studio)$
+bind = $mainMod, F2, pass, class:^(com.obsproject.Studio)$
+bind = $mainMod, F3, pass, class:^(com.obsproject.Studio)$
+bind = $mainMod, escape, pass, class:^(com.obsproject.Studio)$
+
 bindn = , Escape, exec, bash -c '[[ $(hyprctl activewindow -j | jq -r ".class") == "ephemeral-kitty" ]] && pypr hide ephemeral-kitty'
 
 bindel = ,XF86AudioRaiseVolume, exec, wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+
