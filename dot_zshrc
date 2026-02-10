@@ -47,6 +47,10 @@ alias copy="wl-copy"
 alias dotfiles="chezmoi"
 alias cat="bat --plain --paging=never"
 alias cl="printf '\033[2J\033[3J\033[1;1H'"
+clients() {
+	current_workspace=$(hyprctl monitors -j | jq -r ".[] | select(.focused==true) | .activeWorkspace.id")
+	hyprctl clients | awk -v RS="" -v ORS="\n\n" "\$0 ~ /(^|\n)[ \t]*workspace: ${current_workspace} \\(${current_workspace}\\)(\n|$)/"
+}
 
 alias f='fzf --multi --style full --preview "
 if file --mime-type {} | grep -qF image/; then
