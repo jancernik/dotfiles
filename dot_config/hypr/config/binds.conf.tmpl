@@ -18,13 +18,18 @@ bind = $mainMod, F, fullscreen
 bind = $mainMod, Q, killactive
 bind = $mainMod, R, togglefloating
 bind = $mainMod, P, pseudo
-bind = $mainMod, J, togglesplit
+bind = $mainMod, K, togglesplit
 bind = $mainModShift, M, exit
+
+bind = $mainMod, Y, exec, bash -lc 'printf "set-filter top-left\n" | socat - UNIX-CONNECT:$XDG_RUNTIME_DIR/obs-control.sock'
+bind = $mainMod, U, exec, bash -lc 'printf "set-filter top-right\n" | socat - UNIX-CONNECT:$XDG_RUNTIME_DIR/obs-control.sock'
+bind = $mainMod, H, exec, bash -lc 'printf "set-filter bottom-left\n" | socat - UNIX-CONNECT:$XDG_RUNTIME_DIR/obs-control.sock'
+bind = $mainMod, J, exec, bash -lc 'printf "set-filter bottom-right\n" | socat - UNIX-CONNECT:$XDG_RUNTIME_DIR/obs-control.sock'
+bind = $mainMod, G, exec, bash -lc 'printf "set-filter fullscreen\n" | socat - UNIX-CONNECT:$XDG_RUNTIME_DIR/obs-control.sock'
 
 bind = $mainMod, F1, pass, class:^(com.obsproject.Studio)$
 bind = $mainMod, F2, pass, class:^(com.obsproject.Studio)$
 bind = $mainMod, F3, pass, class:^(com.obsproject.Studio)$
-bind = $mainMod, escape, pass, class:^(com.obsproject.Studio)$
 
 bindn = , Escape, exec, bash -c '[[ $(hyprctl activewindow -j | jq -r ".class") == "ephemeral-kitty" ]] && pypr hide ephemeral-kitty'
 
