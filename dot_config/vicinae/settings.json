@@ -1,6 +1,6 @@
 {
   "pop_to_root_on_close": true,
-  "close_on_focus_loss": true,
+  "close_on_focus_loss": false,
   "launcher_window": {
     "layer_shell": {
       "enabled": false

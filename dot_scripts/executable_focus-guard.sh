@@ -1,132 +1,116 @@
 #!/usr/bin/env bash
 
+# Locks focus to vicinae while it is open. Closes it when clicking outside.
+
 set -u
-IFS=$' \t\n'
-shopt -s extglob
 
-VIC_CLASS="${VIC_CLASS:-vicinae}"
-WOFI_CLASS="${WOFI_CLASS:-wofi}"
-WOFI_CMD="${WOFI_CMD:-wofi}"
+VICINAE_CLASS="${VICINAE_CLASS:-vicinae}"
+DEFAULT_FOLLOW_MOUSE="${DEFAULT_FOLLOW_MOUSE:-1}"
+DEFAULT_MOUSE_REFOCUS="${DEFAULT_MOUSE_REFOCUS:-1}"
 
-SOCK="$XDG_RUNTIME_DIR/hypr/${HYPRLAND_INSTANCE_SIGNATURE}/.socket2.sock"
+EVENT_SOCKET="$XDG_RUNTIME_DIR/hypr/${HYPRLAND_INSTANCE_SIGNATURE}/.socket2.sock"
+[[ -S "$EVENT_SOCKET" ]] || EVENT_SOCKET="$XDG_RUNTIME_DIR/hypr/${HYPRLAND_INSTANCE_SIGNATURE}/socket2.sock"
 
-normalize_addr() {
-	local a="$1"
-	[[ "$a" == 0x* ]] && {
-		printf '%s\n' "$a"
-		return
-	}
-	printf '0x%s\n' "$a"
+normalize_address() {
+	local address="$1"
+	[[ "$address" == 0x* ]] && { printf '%s\n' "$address"; return; }
+	printf '0x%s\n' "$address"
 }
 
-parse_openwindow() {
-	local payload="$1"
-	if [[ "$payload" == *:* ]]; then
-		local addr cls title
-		addr="$(sed -n 's/.*address:\([^,]*\).*/\1/p' <<<"$payload")"
-		cls="$(sed -n 's/.*class:\([^,]*\).*/\1/p'   <<<"$payload")"
-		title="$(sed -n 's/.*title:\([^,]*\).*/\1/p' <<<"$payload")"
-		printf '%s\t%s\t%s\n' "$addr" "$cls" "$title"
-	else
-		local addr rest cls title
-		addr="${payload%%,*}"
-		rest="${payload#*,}"
-		rest="${rest#*,}"
-		cls="${rest%%,*}"
-		title="${rest#*,}"
-		printf '%s\t%s\t%s\n' "$addr" "$cls" "$title"
-	fi
+parse_openwindow_payload() {
+	local payload="$1" remaining
+	local window_address="${payload%%,*}"
+	remaining="${payload#*,}"
+	remaining="${remaining#*,}"
+	local window_class="${remaining%%,*}"
+	printf '%s\t%s\n' "$window_address" "$window_class"
 }
 
-get_follow_mouse() {
-	hyprctl getoption input:follow_mouse 2>/dev/null |
-		awk -F': *' '$1=="int"{print $2; exit}'
+lock_focus() {
+	hyprctl --batch \
+		"keyword input:follow_mouse 0; keyword input:mouse_refocus 0" \
+		>/dev/null 2>&1 || true
 }
 
-set_follow_mouse() {
-	hyprctl keyword input:follow_mouse "$1" >/dev/null 2>&1 || true
+unlock_focus() {
+	hyprctl --batch \
+		"keyword input:follow_mouse $DEFAULT_FOLLOW_MOUSE; keyword input:mouse_refocus $DEFAULT_MOUSE_REFOCUS" \
+		>/dev/null 2>&1 || true
 }
 
-kill_wofi() {
-	pkill -x "$WOFI_CMD" >/dev/null 2>&1 && return 0
-	killall "$WOFI_CMD" >/dev/null 2>&1 || true
+close_all_vicinae_windows() {
+	local window_address
+	for window_address in "${!open_vicinae_windows[@]}"; do
+		hyprctl dispatch closewindow "address:$window_address" >/dev/null 2>&1 || true
+	done
 }
 
-declare -A VIC_ADDRS=()
-declare -A WOFI_ADDRS=()
-SAVED_FOLLOW_MOUSE=""
-LAST_ACTIVE_CLASS=""
+declare -A open_vicinae_windows=()
 
-update_follow_mouse() {
-	if ((${#VIC_ADDRS[@]} > 0 || ${#WOFI_ADDRS[@]} > 0)); then
-		[[ -n "$SAVED_FOLLOW_MOUSE" ]] || SAVED_FOLLOW_MOUSE="$(get_follow_mouse || true)"
-		set_follow_mouse 0
-	else
-		[[ -n "$SAVED_FOLLOW_MOUSE" ]] || return 0
-		set_follow_mouse "$SAVED_FOLLOW_MOUSE"
-		SAVED_FOLLOW_MOUSE=""
-	fi
-}
-
-initial_sync() {
-	command -v jq >/dev/null 2>&1 || {
-		update_follow_mouse
+sync_initial_state() {
+	if ! command -v jq >/dev/null 2>&1; then
+		unlock_focus
 		return 0
-	}
+	fi
 
-	while IFS= read -r addr; do
-		addr="$(normalize_addr "$addr")"
-		VIC_ADDRS["$addr"]=1
+	local window_address
+	while IFS= read -r window_address; do
+		window_address="$(normalize_address "$window_address")"
+		open_vicinae_windows["$window_address"]=1
 	done < <(
 		hyprctl clients -j 2>/dev/null |
-			jq -r --arg c "$VIC_CLASS" '.[] | select(.class==$c) | .address'
+			jq -r --arg class "$VICINAE_CLASS" '.[] | select(.class == $class) | .address'
 	)
 
-	while IFS= read -r addr; do
-		addr="$(normalize_addr "$addr")"
-		WOFI_ADDRS["$addr"]=1
-	done < <(
-		hyprctl clients -j 2>/dev/null |
-			jq -r --arg c "$WOFI_CLASS" '.[] | select(.class==$c) | .address'
-	)
-
-	update_follow_mouse
+	if ((${#open_vicinae_windows[@]} > 0)); then
+		lock_focus
+	else
+		unlock_focus
+	fi
 }
 
-initial_sync
+if [[ ! -S "$EVENT_SOCKET" ]]; then
+	printf 'focus-guard: socket not found: %s\n' "$EVENT_SOCKET" >&2
+	exit 1
+fi
 
-socat -u "UNIX-CONNECT:$SOCK" - 2>/dev/null |
-	while IFS= read -r line; do
-		case "${line%%>>*}" in
+sync_initial_state
+
+socat -u "UNIX-CONNECT:$EVENT_SOCKET" - 2>/dev/null |
+	while IFS= read -r event_line; do
+		case "${event_line%%>>*}" in
 		openwindow)
-			payload="${line#openwindow>>}"
-			parsed="$(parse_openwindow "$payload" 2>/dev/null || true)"
-			addr="$(cut -f1 <<<"$parsed")"
-			cls="$(cut -f2 <<<"$parsed")"
-			[[ -n "${addr:-}" && -n "${cls:-}" ]] || continue
-			addr="$(normalize_addr "$addr")"
-			if [[ "$cls" == "$VIC_CLASS" ]]; then
-				VIC_ADDRS["$addr"]=1
-				update_follow_mouse
-			elif [[ "$cls" == "$WOFI_CLASS" ]]; then
-				WOFI_ADDRS["$addr"]=1
-				update_follow_mouse
+			event_payload="${event_line#openwindow>>}"
+			window_info="$(parse_openwindow_payload "$event_payload")"
+			window_address="$(cut -f1 <<<"$window_info")"
+			window_class="$(cut -f2 <<<"$window_info")"
+			[[ -n "${window_address:-}" && -n "${window_class:-}" ]] || continue
+			window_address="$(normalize_address "$window_address")"
+			if [[ "$window_class" == "$VICINAE_CLASS" ]]; then
+				open_vicinae_windows["$window_address"]=1
+				lock_focus
 			fi
 			;;
 		closewindow)
-			payload="${line#closewindow>>}"
-			addr="$(normalize_addr "${payload%%,*}")"
-			unset "VIC_ADDRS[$addr]" 2>/dev/null || true
-			unset "WOFI_ADDRS[$addr]" 2>/dev/null || true
-			update_follow_mouse
+			event_payload="${event_line#closewindow>>}"
+			window_address="$(normalize_address "${event_payload%%,*}")"
+			if [[ -v open_vicinae_windows["$window_address"] ]]; then
+				unset "open_vicinae_windows[$window_address]"
+				if ((${#open_vicinae_windows[@]} == 0)); then
+					unlock_focus
+				fi
+			fi
 			;;
 		activewindow)
-			payload="${line#activewindow>>}"
-			new_class="${payload%%,*}"
-			if [[ "$LAST_ACTIVE_CLASS" == "$WOFI_CLASS" && "$new_class" != "$WOFI_CLASS" ]]; then
-				((${#WOFI_ADDRS[@]} > 0)) && kill_wofi
+			event_payload="${event_line#activewindow>>}"
+			window_class="${event_payload%%,*}"
+			if [[ -n "$window_class" \
+				&& "$window_class" != "$VICINAE_CLASS" \
+				&& ${#open_vicinae_windows[@]} -gt 0 ]]; then
+				close_all_vicinae_windows
+				open_vicinae_windows=()
+				unlock_focus
 			fi
-			LAST_ACTIVE_CLASS="$new_class"
 			;;
 		esac
 	done
