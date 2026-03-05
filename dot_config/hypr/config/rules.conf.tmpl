@@ -9,12 +9,6 @@ windowrule = float off, size 1920 1080, center on, workspace 1 silent, match:cla
 
 windowrule = float on, persistent_size on, match:class ^(gjs)$
 windowrule = float on, persistent_size on, match:class ^(GTK Application)$
-
-{{- if eq .chezmoi.hostname "arch-desktop" }}
-windowrule = move (monitor_w-window_w-27) 91, border_size 0, match:class ^(wofi)$
-{{- else if eq .chezmoi.hostname "arch-laptop" }}
-windowrule = move (monitor_w-window_w-27) 70, border_size 0, match:class ^(wofi)$
-{{- end }}
 windowrule = border_size 0, match:class ^(vicinae)$
 
 layerrule = blur on, ignore_alpha 0, match:namespace vicinae
