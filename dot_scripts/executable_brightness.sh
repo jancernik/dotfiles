@@ -213,6 +213,7 @@ daemon_mode() {
 				if [[ "$message" == *:* ]]; then
 					target_key="${message%%:*}"
 					value="${message#*:}"
+					[[ -n "$target_key" ]] || continue
 				else
 					target_key="all"
 					value="$message"
