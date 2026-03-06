@@ -38,6 +38,13 @@ alignment = 'left'
 newline = true
 
 [[blocks.segments]]
+type = 'session'
+style = 'plain'
+background = 'transparent'
+foreground = '#BABBF1'
+template = '{{ if .SSHSession }}{{ .HostName }} {{ end }}'
+
+[[blocks.segments]]
 type = 'text'
 style = 'plain'
 foreground_templates = [
