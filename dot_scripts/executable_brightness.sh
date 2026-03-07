@@ -5,7 +5,7 @@
 set -euo pipefail
 
 usage() {
-	printf 'Usage: %s [-m N] [0..100|+N|-N|save|restore|daemon]\n' "$0" >&2
+	printf 'Usage: %s [-m N] [0..100|+N|-N|save|restore|dim|daemon]\n' "$0" >&2
 	exit 1
 }
 
@@ -288,7 +288,15 @@ save | s)
 	send_to_daemon "save"
 	;;
 restore | r)
+	touch "$STATE_DIR/brightness.silent"
 	send_to_daemon "restore"
+	(sleep 1; rm -f "$STATE_DIR/brightness.silent") &
+	;;
+dim)
+	touch "$STATE_DIR/brightness.silent"
+	preview_current "0"
+	send_to_daemon "${monitor_index:+${monitor_index}:}0"
+	(sleep 1; rm -f "$STATE_DIR/brightness.silent") &
 	;;
 +* | -*)
 	[[ "$action" =~ ^[+-][0-9]{1,3}$ && ${action:1} -le 100 ]] || usage
