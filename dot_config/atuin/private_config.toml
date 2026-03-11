@@ -20,3 +20,6 @@ records = true
 
 [theme]
 name = "custom-theme"
+
+[ui]
+columns = ["time", "command"]
