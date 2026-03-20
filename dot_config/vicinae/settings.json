@@ -17,5 +17,143 @@
     "layer_shell": {
       "enabled": false
     }
+  },
+  "favorites": [],
+  "providers": {
+    "applications": {
+      "entrypoints": {
+        "avahi-discover": {
+          "enabled": false
+        },
+        "bssh": {
+          "enabled": false
+        },
+        "bvnc": {
+          "enabled": false
+        },
+        "jconsole-java-openjdk": {
+          "enabled": false
+        },
+        "jconsole-java17-openjdk": {
+          "enabled": false
+        },
+        "jconsole-java21-openjdk": {
+          "enabled": false
+        },
+        "jshell-java-openjdk": {
+          "enabled": false
+        },
+        "jshell-java17-openjdk": {
+          "enabled": false
+        },
+        "jshell-java21-openjdk": {
+          "enabled": false
+        }
+      }
+    },
+    "browser-extension": {
+      "enabled": false
+    },
+    "calculator": {
+      "enabled": false
+    },
+    "clipboard": {
+      "entrypoints": {
+        "clear": {
+          "enabled": false
+        },
+        "clear-history": {
+          "enabled": false
+        },
+        "history": {
+          "enabled": false
+        }
+      }
+    },
+    "core": {
+      "entrypoints": {
+        "about": {
+          "enabled": false
+        },
+        "documentation": {
+          "enabled": false
+        },
+        "keybind-settings": {
+          "enabled": false
+        },
+        "list-extensions": {
+          "enabled": false
+        },
+        "manage-fallback": {
+          "enabled": false
+        },
+        "oauth-token-store": {
+          "enabled": false
+        },
+        "open-config-file": {
+          "enabled": false
+        },
+        "open-default-config": {
+          "enabled": false
+        },
+        "prune-memory": {
+          "enabled": false
+        },
+        "refresh-apps": {
+          "enabled": false
+        },
+        "reload-scripts": {
+          "enabled": false
+        },
+        "report-bug": {
+          "enabled": false
+        },
+        "search-builtin-icons": {
+          "enabled": false
+        },
+        "search-emojis": {
+          "enabled": false
+        },
+        "sponsor": {
+          "enabled": false
+        },
+        "store": {
+          "enabled": false
+        }
+      }
+    },
+    "developer": {
+      "enabled": false
+    },
+    "files": {
+      "enabled": false
+    },
+    "font": {
+      "enabled": false
+    },
+    "manage-shortcuts": {
+      "enabled": false
+    },
+    "power": {
+      "enabled": false
+    },
+    "raycast-compat": {
+      "enabled": false
+    },
+    "scripts": {
+      "enabled": false
+    },
+    "shortcuts": {
+      "enabled": false
+    },
+    "system": {
+      "enabled": false
+    },
+    "theme": {
+      "enabled": false
+    },
+    "wm": {
+      "enabled": false
+    }
   }
 }
