@@ -122,6 +122,7 @@ source "$HOME/.config/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlight
 source "$HOME/.config/zsh/plugins/zsh-shift-select/zsh-shift-select.plugin.zsh"
 
 # Atuin
+HISTSIZE=1000
 source "$HOME/.atuin/bin/env"
 eval "$(atuin init zsh --disable-up-arrow)"
-fc -R =(atuin search --cmd-only --limit 200)
+fc -R =(atuin search --cmd-only --limit 1000)
