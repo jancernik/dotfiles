@@ -1,4 +1,5 @@
-windowrule = workspace special:magic silent, no_initial_focus on, match:class ^(chrome-home\.cuasar\.cc__-Default)$
+workspace = special:home-assistant, on-created-empty:chromium --new-window --app=https://home.cuasar.cc
+windowrule = workspace special:home-assistant silent, no_initial_focus on, match:class ^(chrome-home\.cuasar\.cc__-Default)$
 
 windowrule = float on, size 380 600, center on, match:class ^(brave-nngceckbapebfimnlniiiahkandclblb-Default)$ # Bitwarden
 windowrule = float on, size 300 616, center on, match:class ^(org.gnome.Calculator)$
