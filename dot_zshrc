@@ -126,3 +126,6 @@ HISTSIZE=1000
 source "$HOME/.atuin/bin/env"
 eval "$(atuin init zsh --disable-up-arrow)"
 fc -R =(atuin search --cmd-only --limit 1000)
+
+# SSH
+[ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
