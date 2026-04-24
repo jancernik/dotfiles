@@ -43,6 +43,7 @@ alias vpn="~/.scripts/vpn.sh"
 alias cam="~/.scripts/camera.sh"
 alias dictate="~/.scripts/dictate/dictate.sh"
 alias r="trash-put"
+alias ls="eza"
 alias rp="realpath"
 alias copy="wl-copy"
 alias dotfiles="chezmoi"
@@ -115,6 +116,9 @@ fi
 zstyle ':fzf-tab:*' fzf-flags \
   --info=hidden \
   --color=pointer:#BABBF1,marker:#BABBF1,hl:#80A1EF,hl+:#80A1EF
+
+# try-cli
+eval "$(try init ~/src/tries)"
 
 # Plugins
 source "$HOME/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh"
