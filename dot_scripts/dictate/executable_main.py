@@ -90,6 +90,15 @@ def transcribe(audio_path: Path, args: argparse.Namespace) -> str:
         language=args.language,
         beam_size=args.beam_size,
         vad_filter=True,
+        condition_on_previous_text=True,
+        initial_prompt=(
+            "This is a spoken dictation intended for a text input. "
+            "Convert it into clean, natural written text. "
+            "Add punctuation and capitalization where appropriate. "
+            "Split long speech into readable sentences. "
+            "Keep the wording casual and faithful to the speaker. "
+            "Do not summarize, rewrite, polish heavily, or add new information."
+        )
     )
 
     return " ".join(segment.text.strip() for segment in segments).strip()
