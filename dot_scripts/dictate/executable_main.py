@@ -39,6 +39,8 @@ def wait_for_enter() -> None:
 
             if char in ("\n", "\r"):
                 return
+            if char == "\x1b":
+                raise KeyboardInterrupt
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
@@ -151,4 +153,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        set_status("")
+        print(file=sys.stderr)
+        sys.exit(0)
