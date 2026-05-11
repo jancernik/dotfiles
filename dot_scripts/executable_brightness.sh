@@ -52,20 +52,27 @@ list_devices() {
 	case "$backend" in
 	brightnessctl) ls /sys/class/backlight/ 2>/dev/null ;;
 	ddcutil)
-		ddcutil detect --terse | awk '
-				/I2C bus:/ {
-					if (match($0, /\/dev\/i2c-([0-9]+)/, m)) {
-						bus = m[1]
-						next
+		local attempt out
+		for attempt in 1 2 3; do
+			out=$(ddcutil detect --terse 2>/dev/null | awk '
+					/I2C bus:/ {
+						if (match($0, /\/dev\/i2c-([0-9]+)/, m)) {
+							bus = m[1]
+							next
+						}
 					}
-				}
-				/Monitor:/ {
-					if (bus != "") {
-						print bus
-						bus = ""
+					/Monitor:/ {
+						if (bus != "") {
+							print bus
+							bus = ""
+						}
 					}
-				}
-      ' | sort -n | uniq
+      			' | sort -n | uniq)
+			[[ -n "$out" ]] && { printf '%s\n' "$out"; return 0; }
+			printf 'ddcutil detect attempt %d failed, retrying...\n' "$attempt" >&2
+			sleep 2
+		done
+		return 1
 		;;
 	esac
 }
@@ -81,7 +88,9 @@ get_brightness() {
 		printf '%d' "$((brightness_span > 0 ? (clamped - BACKLIGHT_MIN) * 100 / brightness_span : 50))"
 		;;
 	ddcutil)
-		ddcutil --bus "$1" getvcp 0x10 --terse 2>/dev/null | awk '{print $4}'
+		local val
+		val=$(ddcutil --bus "$1" getvcp 0x10 --terse 2>/dev/null | awk '{print $4}')
+		printf '%d' "${val:-50}"
 		;;
 	esac
 }
@@ -154,7 +163,7 @@ flush_pending() {
 			job_pids+=("$!")
 		done
 	fi
-	for pid in "${job_pids[@]}"; do wait "$pid"; done
+	for pid in "${job_pids[@]}"; do wait "$pid" || true; done
 	_pending_changes=()
 }
 
@@ -165,6 +174,8 @@ daemon_mode() {
 		printf 'No displays found\n' >&2
 		exit 1
 	}
+
+	rm -f "$STATE_DIR/brightness.silent"
 
 	mkfifo "$PIPE" 2>/dev/null || true
 	trap 'rm -f "$PIPE"' EXIT
@@ -207,7 +218,7 @@ daemon_mode() {
 					i=$((i + 1))
 				done <"$SAVE_FILE"
 				write_current
-				for pid in "${job_pids[@]}"; do wait "$pid"; done
+				for pid in "${job_pids[@]}"; do wait "$pid" || true; done
 				;;
 			*)
 				if [[ "$message" == *:* ]]; then
@@ -282,7 +293,12 @@ send_to_daemon() {
 
 case "$action" in
 daemon)
-	daemon_mode
+	while true; do
+		(daemon_mode) || true
+		printf 'Daemon exited, restarting in 3s...\n' >&2
+		sleep 3
+		rm -f "$PIPE"
+	done
 	;;
 save | s)
 	send_to_daemon "save"
