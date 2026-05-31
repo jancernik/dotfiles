@@ -1,0 +1,17 @@
+Terminal = "kitty"
+EphemeralTerminal = "pypr-client toggle ephemeral-kitty"
+Files = "nautilus"
+Menu = "vicinae toggle"
+Emojis = "vicinae vicinae://launch/core/search-emojis"
+Clipboard = "vicinae vicinae://launch/clipboard/history"
+Browser = "brave"
+Whatsapp = "brave --new-window --app=https://web.whatsapp.com"
+Obsidian = "obsidian --disable-gpu --ozone-platform-hint=wayland"
+
+{{ if eq .chezmoi.hostname "arch-desktop" -}}
+InitialWorkspace = 6
+MainMonitor = 1
+{{ else if eq .chezmoi.hostname "arch-laptop" -}}
+InitialWorkspace = 1
+MainMonitor = 0
+{{- end -}}

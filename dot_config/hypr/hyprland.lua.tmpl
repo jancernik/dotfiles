@@ -1,0 +1,143 @@
+package.path = package.path .. ";/home/jan/plugins/split-monitor-workspaces/lua/?.lua"
+smw = require("split-monitor-workspaces")
+
+smw.setup({
+    workspace_count = 5,
+    keep_focused = true,
+    enable_notifications = false,
+    enable_persistent_workspaces = true,
+    enable_wrapping = false,
+{{- if eq .chezmoi.hostname "arch-desktop" }}
+    monitor_priority = {"DP-1", "DP-2", "DP-3"},
+{{- end }}
+})
+
+require("config/variables")
+require("config/env")
+require("config/monitors")
+require("config/autostart")
+require("config/binds")
+require("config/rules")
+
+hl.config({
+    general = {
+
+{{- if eq .chezmoi.hostname "arch-desktop" }}
+        gaps_in = 6,
+        gaps_out = 12,
+        border_size = 3,
+{{- else if eq .chezmoi.hostname "arch-laptop" }}
+        gaps_in = 3,
+        gaps_out = 6,
+        border_size = 2,
+{{- end }}
+        col = {
+            active_border = "rgba(eeeeee55)",
+            inactive_border = "rgba(FFFFFF00)",
+            nogroup_border_active = "rgba(eeeeee55)",
+            nogroup_border = "rgba(FFFFFF00)",
+        },
+        resize_on_border = false,
+        allow_tearing = false,
+        layout = "dwindle",
+    },
+})
+
+hl.config({
+    decoration = {
+        rounding = 8,
+        rounding_power = 3,
+        active_opacity = 1.0,
+        inactive_opacity = 1.0,
+        shadow = {
+            enabled = false,
+            range = 4,
+            render_power = 3,
+            color = "rgba(1a1a1aee)",
+        },
+        blur = {
+            ignore_opacity = true,
+            enabled = true,
+            size = 5,
+            passes = 3,
+            vibrancy = 0.1696,
+        },
+    },
+})
+
+hl.config({
+    misc = {
+        disable_hyprland_logo = true,
+        disable_autoreload = true,
+        key_press_enables_dpms = true,
+        mouse_move_enables_dpms = true,
+    },
+
+    xwayland = {
+        force_zero_scaling = true,
+        use_nearest_neighbor = true,
+    },
+
+    animations = {
+        enabled = true,
+    },
+
+    dwindle = {
+        preserve_split = true,
+    },
+
+    master = {
+        new_status = "master",
+    },
+})
+
+hl.config({
+    input = {
+        kb_layout = "us",
+        kb_variant = "altgr-intl",
+        kb_options = "lv3:ralt_switch",
+        kb_model = "",
+        kb_options = "compose:menu",
+        kb_rules = "",
+
+        follow_mouse = 1,
+        float_switch_override_focus = 0,
+        sensitivity = -0.2,
+        accel_profile = "flat",
+    },
+})
+
+hl.curve("easeOutQuint",   { type = "bezier", points = { {0.22, 1},   {0.36, 1}   } })
+hl.curve("easeOutCubic",   { type = "bezier", points = { {0.33, 1},   {0.68, 1}   } })
+hl.curve("easeOutQuad",    { type = "bezier", points = { {0.5, 1},    {0.89, 1}   } })
+hl.curve("easeInOutCirc",  { type = "bezier", points = { {0.85, 0},   {0.15, 1}   } })
+hl.curve("easeInOutQuart", { type = "bezier", points = { {0.76, 0},   {0.24, 1}   } })
+hl.curve("easeInOutCubic", { type = "bezier", points = { {0.65, 0},   {0.35, 1}   } })
+hl.curve("easeInQuint",    { type = "bezier", points = { {0.64, 0},   {0.78, 0}   } })
+hl.curve("linear",         { type = "bezier", points = { {0, 0},      {1, 1}      } })
+hl.curve("almostLinear",   { type = "bezier", points = { {0.5, 0.5},  {0.75, 1}   } })
+hl.curve("quick",          { type = "bezier", points = { {0.15, 0},   {0.1, 1}    } })
+
+hl.animation({ leaf = "global",        enabled = true, speed = 10,   bezier = "almostLinear" })
+hl.animation({ leaf = "border",        enabled = true, speed = 5.39, bezier = "easeOutQuint" })
+hl.animation({ leaf = "windows",       enabled = true, speed = 4.79, bezier = "easeOutQuint" })
+hl.animation({ leaf = "windowsIn",     enabled = true, speed = 4.1,  bezier = "easeOutQuint",  style = "popin 87%" })
+hl.animation({ leaf = "windowsOut",    enabled = true, speed = 1.49, bezier = "linear",        style = "popin 87%" })
+hl.animation({ leaf = "fadeIn",        enabled = true, speed = 1.73, bezier = "almostLinear" })
+hl.animation({ leaf = "fadeOut",       enabled = true, speed = 1.46, bezier = "almostLinear" })
+hl.animation({ leaf = "fade",          enabled = true, speed = 3.03, bezier = "quick" })
+hl.animation({ leaf = "layers",        enabled = true, speed = 3.81, bezier = "easeOutQuint" })
+hl.animation({ leaf = "layersIn",      enabled = true, speed = 5,    bezier = "easeOutQuint",  style = "fade" })
+hl.animation({ leaf = "layersOut",     enabled = true, speed = 3,    bezier = "easeInOutCirc", style = "fade" })
+hl.animation({ leaf = "fadeLayersIn",  enabled = true, speed = 3,    bezier = "easeOutQuint" })
+hl.animation({ leaf = "fadeLayersOut", enabled = true, speed = 3,    bezier = "easeInQuint" })
+hl.animation({ leaf = "workspaces",    enabled = true, speed = 3,    bezier = "easeInOutCubic", style = "slidevert" })
+hl.animation({ leaf = "zoomFactor",    enabled = true, speed = 7,    bezier = "quick" })
+
+{{ if eq .chezmoi.hostname "arch-laptop" -}}
+hl.device({
+    name = "asue140d:00-04f3:31b9-touchpad",
+    sensitivity = -0.1,
+    natural_scroll = true,
+})
+{{- end -}}
