@@ -87,3 +87,17 @@ hl.bind(mainMod .. " + CTRL + left", hl.dsp.window.swap({ direction = "left" }))
 hl.bind(mainMod .. " + CTRL + right", hl.dsp.window.swap({ direction = "right" }))
 hl.bind(mainMod .. " + CTRL + up", hl.dsp.window.swap({ direction = "up" }))
 hl.bind(mainMod .. " + CTRL + down", hl.dsp.window.swap({ direction = "down" }))
+
+{{ if eq .chezmoi.hostname "arch-laptop" -}}
+hl.bind("XF86TouchpadToggle", hl.dsp.exec_cmd([[bash -c '
+state_file=/tmp/touchpad-enabled
+
+if [ "$(cat "$state_file" 2>/dev/null)" = "false" ]; then
+  hyprctl eval "hl.device({ name = \"asue140d:00-04f3:31b9-touchpad\", enabled = true })"
+  echo true > "$state_file"
+else
+  hyprctl eval "hl.device({ name = \"asue140d:00-04f3:31b9-touchpad\", enabled = false })"
+  echo false > "$state_file"
+fi
+']]))
+{{- end -}}
