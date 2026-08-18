@@ -6,7 +6,7 @@ set -euo pipefail
 
 URL="https://dash.cuasar.cc"
 TARGET_CLASS="brave-browser"
-TARGET_TITLE="Cuasar Dashboard - Brave"
+TARGET_TITLE="Dashboard - Brave"
 
 active_json="$(hyprctl activewindow -j 2>/dev/null || true)"
 
@@ -20,7 +20,7 @@ active_address="$(jq -r '.address // ""' <<< "$active_json")"
 
 if [[ "$active_class" == "$TARGET_CLASS" ]]; then
   if [[ "$active_title" == "$TARGET_TITLE" ]]; then
-    exec hyprctl dispatch sendshortcut "CONTROL,W,address:$active_address"
+    exec hyprctl dispatch "hl.dsp.send_shortcut({ mods = 'CONTROL', key = 'W', window = 'address:$active_address' })"
   else
     exec brave "$URL"
   fi
