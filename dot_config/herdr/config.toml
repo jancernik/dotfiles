@@ -1,0 +1,42 @@
+onboarding = false
+
+[theme]
+name = "catppuccin"
+
+auto_switch = false
+[theme.custom]
+panel_bg = "#1D2632"
+surface0 = "#2B2E45"
+surface1 = "#2B2E45"
+accent = "#80A1EF"
+blue = "#80A1EF"
+mauve = "#BABBF1"
+text = "#CCCCCC"
+red = "#CB4B16"
+
+[keys]
+prefix = "ctrl+s"
+
+workspace_picker = ""
+close_pane = "prefix+w"
+
+new_tab = ["prefix+c", "prefix+t"]
+close_tab = ["prefix+shift+x", "prefix+shift+w"]
+
+switch_tab = ["prefix+1..9", "alt+1..9"]
+
+previous_workspace = ["prefix+comma", "ctrl+alt+["]
+next_workspace = ["prefix+period", "ctrl+alt+]"]
+
+split_vertical = ["prefix+v", "prefix+shift+backslash"]
+
+focus_pane_left  = ["prefix+h", "prefix+left", "alt+left"]
+focus_pane_down  = ["prefix+j", "prefix+down", "alt+down"]
+focus_pane_up    = ["prefix+k", "prefix+up", "alt+up"]
+focus_pane_right = ["prefix+l", "prefix+right", "alt+right"]
+
+[[keys.command]]
+key = "ctrl+d"
+type = "shell"
+command = ":"
+description = "ignore Ctrl+D"
