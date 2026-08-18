@@ -97,6 +97,11 @@ _nvm_lazy_load() {
 }
 zsh-defer _nvm_lazy_load
 
+# bun
+[ -s "/home/jan/.bun/_bun" ] && source "/home/jan/.bun/_bun"
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
 # pnpm
 export PNPM_HOME="$HOME/.local/share/pnpm"
 case ":$PATH:" in
