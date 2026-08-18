@@ -11,7 +11,7 @@ hl.window_rule({
 
 hl.window_rule({
   name   = "Bitwarden",
-  match  = { class = "^(brave-nngceckbapebfimnlniiiahkandclblb-Default)$" },
+  match  = { class = "^brave-nngceckbapebfimnlniiiahkandclblb-.*$" },
   float  = true,
   size   = { 480, 630 },
   center = true,
