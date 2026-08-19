@@ -1,0 +1,23 @@
+[user]
+	name = Jan Cernik
+	email = jancernik12@gmail.com
+{{- if eq .chezmoi.hostname "arch-desktop" }}
+	signingkey = E8E46FF8714E10F3
+{{ else if eq .chezmoi.hostname "arch-laptop" }}
+	signingkey = F8B5FC2BA64D52A1
+{{ end -}}
+[init]
+	defaultBranch = main
+[pull]
+	rebase = false
+[color]
+	ui = auto
+[core]
+	editor = code --wait
+[commit]
+	gpgsign = true
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
