@@ -13,7 +13,7 @@ hl.bind(mainModShift .. " + L", hl.dsp.exec_cmd("bash -c 'hyprctl dispatch \"hl.
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd(Clipboard))
 hl.bind(mainMod .. " + code:60", hl.dsp.exec_cmd(Emojis))
 hl.bind(mainMod .. " + code:49", hl.dsp.exec_cmd("~/.scripts/monitor-backlight.sh"))
-hl.bind(mainModShift .. " + R", hl.dsp.exec_cmd("bash -c ' { echo === Reload $(date) ===; ~/.scripts/autoreload.sh; killall -w gjs; ~/minishell/run.sh; } >> /tmp/minishell.log 2>&1'"))
+hl.bind(mainModShift .. " + R", hl.dsp.exec_cmd("bash -c ' { echo === Reload $(date) ===; ~/.scripts/autoreload.sh; pkill -9 qs; ~/minishell/run.sh; } >> /tmp/minishell.log 2>&1'"))
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind(mainMod .. " + R", hl.dsp.window.float())
