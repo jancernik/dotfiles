@@ -136,6 +136,9 @@ zstyle ':fzf-tab:*' fzf-flags \
 # try-cli
 eval "$(try init ~/src/tries)"
 
+# zoxide
+eval "$(zoxide init zsh)"
+
 # Plugins
 source "$HOME/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh"
 source "$HOME/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh"
