@@ -27,6 +27,8 @@ class AlreadyRunning(RuntimeError):
 
 
 BACKLIGHT_MIN = 12
+BACKLIGHT_DEBOUNCE = 0.01
+DDC_DEBOUNCE = 0.1
 DDC_TIMEOUT = 8
 DETECT_TIMEOUT = 18
 SOCKET_TIMEOUT = 0.6
@@ -69,6 +71,13 @@ def command(args, timeout):
     return subprocess.run(
         args, capture_output=True, text=True, timeout=timeout, check=True
     ).stdout
+
+
+def command_error(exc):
+    detail = ""
+    if isinstance(exc, subprocess.CalledProcessError):
+        detail = (exc.stderr or "").strip()
+    return f"{exc}: {detail}" if detail else str(exc)
 
 
 @dataclass(frozen=True)
@@ -143,14 +152,19 @@ def discover():
             )
     if shutil_which("ddcutil"):
         try:
+            backlight_connectors = {
+                device.connector for device in devices if device.connector
+            }
             devices.extend(
-                parse_ddc_detection(
+                device
+                for device in parse_ddc_detection(
                     command(["ddcutil", "detect", "--terse"], DETECT_TIMEOUT)
                 )
+                if device.connector not in backlight_connectors
             )
         except (OSError, subprocess.SubprocessError) as exc:
             ddc_ok = False
-            LOG.warning("DDC discovery failed: %s", exc)
+            LOG.warning("DDC discovery failed: %s", command_error(exc))
     # Ambiguous connectors are not exposed for per-monitor targeting.
     counts = {}
     labels = {}
@@ -208,7 +222,7 @@ def initial_brightness(device):
             maximum = int(match.group(2))
             return clamp(round(int(match.group(1)) * 100 / maximum)), maximum
     except (OSError, ValueError, subprocess.SubprocessError) as exc:
-        LOG.warning("Cannot read %s: %s", device.id, exc)
+        LOG.warning("Cannot read %s: %s", device.id, command_error(exc))
     return None, device.raw_max
 
 
@@ -249,6 +263,17 @@ def set_brightness(device, value):
                 raise
 
 
+def apply_brightness(device, value):
+    try:
+        set_brightness(device, value)
+        return "", None
+    except (OSError, ValueError, subprocess.SubprocessError) as exc:
+        error = command_error(exc)
+        LOG.warning("Cannot set %s: %s", device.id, error)
+        actual, _ = initial_brightness(device)
+        return error, actual
+
+
 class Controller:
     def __init__(self, root):
         self.root = root
@@ -262,7 +287,6 @@ class Controller:
         self.lock = threading.RLock()
         self.wakeup = threading.Event()
         self.stopping = threading.Event()
-        self.last_change = 0.0
         self.refresh_requested = True
 
     def publish(self):
@@ -357,6 +381,7 @@ class Controller:
                             "backend": d.backend,
                             "label": d.label,
                             "value": self.levels.get(d.id),
+                            "error": self.errors.get(d.id, ""),
                         }
                         for d in self.devices.values()
                     ],
@@ -364,7 +389,7 @@ class Controller:
         if action == "refresh":
             with self.lock:
                 self.refresh_requested = True
-            self.wakeup.set()
+                self.wakeup.set()
             return {"ok": True}
         if action not in ("set", "save", "restore"):
             raise ValueError("Invalid action")
@@ -426,8 +451,21 @@ class Controller:
                         values[key] = amount
                 silent = bool(payload.get("silent", False))
             self.levels.update(values)
-            self.pending.update(values)
-            self.last_change = time.monotonic()
+            now = time.monotonic()
+            self.pending.update(
+                {
+                    key: (
+                        value,
+                        now
+                        + (
+                            BACKLIGHT_DEBOUNCE
+                            if self.devices[key].backend == "brightnessctl"
+                            else DDC_DEBOUNCE
+                        ),
+                    )
+                    for key, value in values.items()
+                }
+            )
             if not silent:
                 self.sequence += 1
                 self.event = {
@@ -444,11 +482,20 @@ class Controller:
 
     def run(self):
         next_heartbeat = 0.0
-        with ThreadPoolExecutor(max_workers=8) as pool:
+        inflight = {}
+
+        def wakeup(_):
+            with self.lock:
+                self.wakeup.set()
+
+        with ThreadPoolExecutor(max_workers=8) as pool, ThreadPoolExecutor(
+            max_workers=2
+        ) as backlights:
             while not self.stopping.is_set():
                 with self.lock:
-                    scan_requested = self.refresh_requested
-                    self.refresh_requested = False
+                    scan_requested = self.refresh_requested and not inflight
+                    if scan_requested:
+                        self.refresh_requested = False
                 if scan_requested:
                     try:
                         self.scan(pool)
@@ -458,34 +505,67 @@ class Controller:
                 if now >= next_heartbeat:
                     self.publish()
                     next_heartbeat = now + 2
-                with self.lock:
-                    ready = bool(self.pending) and now - self.last_change >= 0.1
-                    work = self.pending.copy() if ready else {}
-                    if ready:
-                        self.pending.clear()
-                if work:
+
+                updated = False
+                for key, (device, future) in list(inflight.items()):
+                    if not future.done():
+                        continue
+                    del inflight[key]
+                    error, actual = future.result()
                     with self.lock:
-                        futures = {
-                            key: pool.submit(set_brightness, self.devices[key], value)
-                            for key, value in work.items()
-                            if key in self.devices
-                        }
-                    for key, future in futures.items():
-                        try:
-                            future.result()
-                            error = ""
-                        except (OSError, ValueError, subprocess.SubprocessError) as exc:
-                            error = str(exc)
-                            LOG.warning("Cannot set %s: %s", key, exc)
-                        with self.lock:
-                            if key in self.devices:
-                                if error:
-                                    self.errors[key] = error
-                                else:
-                                    self.errors.pop(key, None)
+                        if self.devices.get(key) == device:
+                            if error:
+                                if key not in self.pending:
+                                    self.levels[key] = actual
+                                self.errors[key] = error
+                            else:
+                                self.errors.pop(key, None)
+                            updated = True
+                if updated:
                     self.publish()
-                self.wakeup.wait(0.1 if self.pending else 0.5)
-                self.wakeup.clear()
+
+                with self.lock:
+                    busy = {
+                        (device.backend, device.address)
+                        for device, _ in inflight.values()
+                    }
+                    work = {}
+                    for key, (value, deadline) in self.pending.items():
+                        device = self.devices.get(key)
+                        if not device or now < deadline:
+                            continue
+                        address = (device.backend, device.address)
+                        if address not in busy:
+                            work[key] = (device, value)
+                            busy.add(address)
+                    for key in work:
+                        del self.pending[key]
+                for key, (device, value) in work.items():
+                    executor = backlights if device.backend == "brightnessctl" else pool
+                    future = executor.submit(apply_brightness, device, value)
+                    inflight[key] = (device, future)
+                    future.add_done_callback(wakeup)
+
+                with self.lock:
+                    busy = {
+                        (device.backend, device.address)
+                        for device, _ in inflight.values()
+                    }
+                    deadlines = []
+                    for key, (_, deadline) in self.pending.items():
+                        device = self.devices.get(key)
+                        if device and (device.backend, device.address) not in busy:
+                            deadlines.append(deadline)
+                    if (self.refresh_requested and not inflight) or any(
+                        future.done() for _, future in inflight.values()
+                    ):
+                        timeout = 0
+                    elif deadlines:
+                        timeout = min(0.5, max(0, min(deadlines) - time.monotonic()))
+                    else:
+                        timeout = 0.5
+                    self.wakeup.clear()
+                self.wakeup.wait(timeout)
 
 
 def serve(controller):
