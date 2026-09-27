@@ -37,7 +37,7 @@ bindkey '^[OB'  down-line-or-beginning-search
 
 # Aliases
 alias i="yay -S"
-alias b="~/.scripts/brightness.sh"
+alias b="~/.scripts/brightness/brightness.sh"
 alias m="~/.scripts/monitor-backlight.sh"
 alias vpn="~/.scripts/vpn.sh"
 alias cam="~/.scripts/camera.sh"
