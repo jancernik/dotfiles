@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# Install dependencies for the dictate script
-
 set -euo pipefail
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -15,7 +13,7 @@ if ! command -v "$PYTHON" >/dev/null 2>&1; then
   exit 1
 fi
 
-if [[ ! -d ".venv" ]]; then
+if [[ ! -x ".venv/bin/python" ]]; then
   "$PYTHON" -m venv .venv
 fi
 

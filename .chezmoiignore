@@ -1,6 +1,10 @@
 **/*.env
-**/*.venv
 README.md
 
 **/micro/backups
 **/micro/buffers
+
+**/.venv
+**/__pycache__
+**/.ruff_cache
+**/tests

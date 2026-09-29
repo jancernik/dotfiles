@@ -17,6 +17,8 @@ import sounddevice as sd
 import soundfile as sf
 from faster_whisper import WhisperModel
 
+from osd_mode import Osd, launch_or_stop, toggle
+
 RED = "\033[31m"
 ORANGE = "\033[38;5;208m"
 RESET = "\033[0m"
@@ -49,10 +51,17 @@ def wait_for_enter() -> None:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 
-def record_loop(path: Path, sample_rate: int | None) -> None:
+def record_loop(
+    path: Path,
+    sample_rate: int | None,
+    *,
+    wait_for_stop=None,
+    on_started=None,
+) -> None:
     if sample_rate is None:
         sample_rate = round(sd.query_devices(kind="input")["default_samplerate"])
-    set_status(f"Recording at {sample_rate} Hz... Press Enter to stop.", color=RED)
+    if on_started is None:
+        set_status("Recording... Press Enter to stop.", color=RED)
 
     chunks = []
     capture_statuses = []
@@ -68,7 +77,9 @@ def record_loop(path: Path, sample_rate: int | None) -> None:
         dtype="float32",
         callback=callback,
     ):
-        wait_for_enter()
+        if on_started is not None:
+            on_started()
+        (wait_for_stop or wait_for_enter)()
 
     if capture_statuses:
         warnings = ", ".join(dict.fromkeys(map(str, capture_statuses)))
@@ -157,6 +168,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Recording rate; defaults to the input device's native rate",
     )
     parser.add_argument("--no-copy", action="store_true")
+    parser.add_argument(
+        "--minishell",
+        action="store_true",
+        help="Toggle detached recording with minishell OSD status",
+    )
+    parser.add_argument(
+        "--minishell-worker", action="store_true", help=argparse.SUPPRESS
+    )
     parser.add_argument("--audio-device")
     parser.add_argument(
         "--audio-file",
@@ -178,8 +197,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         parser.error("--sample-rate must be positive")
     if args.audio_file and not args.audio_file.is_file():
         parser.error("--audio-file must name an existing file")
-    if args.audio_file and (args.save_audio or args.keep_recordings):
-        parser.error("saving audio requires a new recording")
+    if args.audio_file and (args.save_audio or args.keep_recordings or args.minishell):
+        parser.error("recording options require a new recording")
+    if args.minishell and args.no_copy:
+        parser.error("--minishell requires clipboard copying")
+    if args.minishell_worker and not args.minishell:
+        parser.error("--minishell-worker requires --minishell")
     if args.save_audio and args.keep_recordings:
         parser.error("use either --save-audio or --keep-recordings")
     if args.save_audio and not args.save_audio.parent.is_dir():
@@ -192,8 +215,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return args
 
 
-def main() -> None:
-    args = parse_args()
+def run(
+    args: argparse.Namespace, *, wait_for_stop=None, osd: Osd | None = None
+) -> None:
     archive_directory = recording_directory() if args.keep_recordings else None
 
     if args.audio_device:
@@ -205,7 +229,15 @@ def main() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         audio_path = args.audio_file or Path(tmpdir) / "dictation.wav"
         if not args.audio_file:
-            record_loop(audio_path, args.sample_rate)
+            if osd:
+                record_loop(
+                    audio_path,
+                    args.sample_rate,
+                    wait_for_stop=wait_for_stop,
+                    on_started=lambda: osd.show("Recording…", "mic"),
+                )
+            else:
+                record_loop(audio_path, args.sample_rate)
             destination = args.save_audio
             if archive_directory is not None:
                 destination = archived_audio_path(archive_directory)
@@ -213,14 +245,44 @@ def main() -> None:
                 save_audio(audio_path, destination)
                 print(f"\nSaved recording to {destination}", file=sys.stderr)
 
-        set_status("Transcribing...", color=ORANGE)
+        if osd:
+            osd.show("Transcribing…", "refresh")
+        else:
+            set_status("Transcribing...", color=ORANGE)
         text = transcribe(audio_path, args)
+
+    if osd:
+        if text:
+            copy_to_clipboard(text)
+            osd.finish("Copied to clipboard", "check")
+        else:
+            osd.finish("No speech detected", "error")
+        return
 
     set_status("")
     print(text)
 
     if not args.no_copy and text:
         copy_to_clipboard(text)
+
+
+def main() -> None:
+    args = parse_args()
+    if args.minishell_worker:
+
+        def job(wait_for_stop):
+            osd = Osd()
+            try:
+                run(args, wait_for_stop=wait_for_stop, osd=osd)
+            except BaseException:
+                osd.finish("Dictation failed", "error")
+                raise
+
+        toggle(job)
+    elif args.minishell:
+        launch_or_stop(sys.argv[1:])
+    else:
+        run(args)
 
 
 if __name__ == "__main__":
