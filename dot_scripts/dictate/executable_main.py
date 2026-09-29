@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -132,11 +133,44 @@ def copy_to_clipboard(text: str) -> None:
     )
 
 
+def default_compute_type(device: str) -> str:
+    if device != "cuda":
+        return "int8"
+    try:
+        result = subprocess.run(
+            [
+                "nvidia-smi",
+                "--query-gpu=memory.total",
+                "--format=csv,noheader,nounits",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True,
+        )
+        totals = [int(value) for value in re.findall(r"\d+", result.stdout)]
+        if totals and min(totals) >= 6 * 1024:
+            return "float16"
+    except (
+        OSError,
+        ValueError,
+        subprocess.CalledProcessError,
+        subprocess.TimeoutExpired,
+    ):
+        pass
+    return "int8_float16"
+
+
 def transcribe(audio_path: Path, args: argparse.Namespace) -> str:
+    compute_type = (
+        args.compute_type
+        if args.compute_type != "auto"
+        else default_compute_type(args.device)
+    )
     model = WhisperModel(
         args.model,
         device=args.device,
-        compute_type=args.compute_type,
+        compute_type=compute_type,
     )
 
     segments, _info = model.transcribe(
@@ -160,7 +194,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--language", default="en", help="Use 'auto' for language detection"
     )
     parser.add_argument("--device", default="cuda")
-    parser.add_argument("--compute-type", default="float16")
+    parser.add_argument(
+        "--compute-type",
+        default="auto",
+        help="'auto' uses float16 on GPUs with 6GB+ VRAM, int8_float16 below that",
+    )
     parser.add_argument("--beam-size", type=int, default=5)
     parser.add_argument(
         "--sample-rate",
