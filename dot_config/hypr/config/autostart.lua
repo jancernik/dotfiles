@@ -10,7 +10,6 @@ hl.on("hyprland.start", function()
 
   hl.exec_cmd([[bash -c '{ echo "=== Start $(date) ==="; ~/.scripts/focus-guard.sh; } >> /tmp/focus-guard.log 2>&1']])
   hl.exec_cmd([[bash -c '{ echo "=== Start $(date) ==="; ~/.scripts/brightness/brightness.sh daemon; } >> /tmp/brightness.log 2>&1']])
-  hl.exec_cmd([[bash -c '{ echo "=== Start $(date) ==="; ~/.scripts/autoreload.sh --watch; } >> /tmp/autoreload.log 2>&1']])
   hl.exec_cmd([[bash -c '{ echo "=== Start $(date) ==="; ~/minishell/run.sh; } >> /tmp/minishell.log 2>&1']])
 
   hl.exec_cmd(string.format("hyprctl dispatch workspace %s", InitialWorkspace))
