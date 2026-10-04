@@ -2,6 +2,13 @@
 
 set -euo pipefail
 
+if [[ -f "$HOME/.scripts/.env" ]]; then
+  set -a
+  # shellcheck source=/dev/null
+  source "$HOME/.scripts/.env"
+  set +a
+fi
+
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 venv="$DIR/.venv"
 

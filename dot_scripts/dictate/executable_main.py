@@ -18,6 +18,7 @@ import sounddevice as sd
 import soundfile as sf
 from faster_whisper import WhisperModel
 
+from format_text import maybe_format
 from osd_mode import Osd, launch_or_stop, toggle
 
 RED = "\033[31m"
@@ -207,6 +208,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--no-copy", action="store_true")
     parser.add_argument(
+        "--no-format",
+        action="store_true",
+        help="Keep the raw transcript instead of the optional formatting pass",
+    )
+    parser.add_argument(
         "--minishell",
         action="store_true",
         help="Toggle detached recording with minishell OSD status",
@@ -288,6 +294,13 @@ def run(
         else:
             set_status("Transcribing...", color=ORANGE)
         text = transcribe(audio_path, args)
+        if not args.no_format and text:
+            if osd:
+                text = maybe_format(
+                    text, on_status=lambda message: osd.show(message, "refresh")
+                )
+            else:
+                text = maybe_format(text)
 
     if osd:
         if text:
