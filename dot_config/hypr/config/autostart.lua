@@ -1,7 +1,6 @@
 hl.on("hyprland.start", function()
   hl.exec_cmd("udiskie")
   hl.exec_cmd("hypridle")
-  hl.exec_cmd("swaync")
   hl.exec_cmd("pypr")
   hl.exec_cmd("kdeconnectd")
   hl.exec_cmd("hyprpm reload")
