@@ -43,9 +43,9 @@ hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = tr
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
 
-hl.bind("PRINT", hl.dsp.exec_cmd("hyprshot -m region"))
-hl.bind("CTRL + PRINT", hl.dsp.exec_cmd("hyprshot -m output"))
-hl.bind("SHIFT + PRINT", hl.dsp.exec_cmd("hyprshot -m window"))
+hl.bind("PRINT", hl.dsp.exec_cmd("~/.scripts/screenshot.sh region"))
+hl.bind("CTRL + PRINT", hl.dsp.exec_cmd("~/.scripts/screenshot.sh output"))
+hl.bind("SHIFT + PRINT", hl.dsp.exec_cmd("~/.scripts/screenshot.sh window"))
 
 hl.bind("insert", hl.dsp.exec_cmd(""))
 
