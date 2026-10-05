@@ -24,7 +24,6 @@ hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind(mainMod .. " + R", hl.dsp.window.float())
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + D", hl.dsp.layout("togglesplit"))
-hl.bind(mainModShift .. " + M", hl.dsp.exit())
 
 hl.bind("Escape", hl.dsp.exec_cmd([=[bash -c '[[ $(hyprctl activewindow -j | jq -r ".class") == "ephemeral-kitty" ]] && pypr hide ephemeral-kitty']=]), { non_consuming = true })
 
@@ -52,6 +51,13 @@ hl.bind("SHIFT + PRINT", hl.dsp.exec_cmd("~/.scripts/screenshot.sh window"))
 hl.bind("insert", function() end)
 
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("~/.scripts/toggle-dashboard.sh"))
+
+hl.bind(mainMod .. " + N", hl.dsp.global("quickshell:notificationsToggle"))
+hl.bind(mainMod .. " + M", hl.dsp.global("quickshell:indicatorsToggle"))
+hl.bind(mainModShift .. " + N", hl.dsp.global("quickshell:notificationsClear"))
+hl.bind(mainModShift .. " + M", hl.dsp.global("quickshell:powerToggle"))
+hl.bind(mainMod .. " + B", hl.dsp.global("quickshell:barPeek"))
+hl.bind(mainModShift .. " + B", hl.dsp.global("quickshell:barToggle"))
 
 hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("home-assistant"))
 hl.bind("mouse:275", hl.dsp.workspace.toggle_special("home-assistant"), { release = true })
