@@ -1,5 +1,6 @@
 local mainMod = "SUPER"
 local mainModShift = "SUPER + SHIFT"
+local fullscreen = require("config/fullscreen")
 
 hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd(Terminal))
 hl.bind(mainModShift .. " + Return", hl.dsp.exec_cmd(EphemeralTerminal))
@@ -16,8 +17,9 @@ hl.bind(mainMod .. " + code:49", hl.dsp.exec_cmd("~/.scripts/monitor-backlight.s
 hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("~/.scripts/audio-cycle.sh sink"))
 hl.bind(mainModShift .. " + Tab", hl.dsp.exec_cmd("~/.scripts/audio-cycle.sh source"))
 hl.bind(mainModShift .. " + D", hl.dsp.exec_cmd("~/.scripts/dictate/dictate.sh --minishell"))
-hl.bind(mainModShift .. " + R", hl.dsp.exec_cmd("bash -c ' { echo === Reload $(date) ===; ~/.scripts/autoreload.sh; pkill -9 qs; ~/minishell/run.sh; } >> /tmp/minishell.log 2>&1'"))
-hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
+hl.bind(mainModShift .. " + R", hl.dsp.exec_cmd("bash -c ' { echo === Reload $(date) ===; hyprctl reload; pkill -9 qs; ~/minishell/run.sh; } >> /tmp/minishell.log 2>&1'"))
+hl.bind(mainMod .. " + F", fullscreen.toggle_max)
+hl.bind(mainModShift .. " + F", fullscreen.toggle_soft)
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind(mainMod .. " + R", hl.dsp.window.float())
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
