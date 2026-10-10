@@ -1,4 +1,4 @@
-package.path = package.path .. ";/home/jan/plugins/split-monitor-workspaces/lua/?.lua"
+package.path = package.path .. ";" .. os.getenv("HOME") .. "/plugins/split-monitor-workspaces/lua/?.lua"
 smw = require("split-monitor-workspaces")
 
 smw.setup({
