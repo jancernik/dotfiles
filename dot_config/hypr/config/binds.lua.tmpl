@@ -17,7 +17,7 @@ hl.bind(mainMod .. " + code:49", hl.dsp.exec_cmd("~/.scripts/monitor-backlight.s
 hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("~/.scripts/audio-cycle.sh sink"))
 hl.bind(mainModShift .. " + Tab", hl.dsp.exec_cmd("~/.scripts/audio-cycle.sh source"))
 hl.bind(mainModShift .. " + D", hl.dsp.exec_cmd("~/.scripts/dictate/dictate.sh --minishell"))
-hl.bind(mainModShift .. " + R", hl.dsp.exec_cmd("bash -c ' { echo === Reload $(date) ===; hyprctl reload; pkill -9 qs; ~/minishell/run.sh; } >> /tmp/minishell.log 2>&1'"))
+hl.bind(mainModShift .. " + R", hl.dsp.exec_cmd("bash -c 'hyprctl reload; pkill -9 qs; uwsm app -- ~/minishell/run.sh'"))
 hl.bind(mainMod .. " + F", fullscreen.toggle_max)
 hl.bind(mainModShift .. " + F", fullscreen.toggle_soft)
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
@@ -25,14 +25,17 @@ hl.bind(mainMod .. " + R", hl.dsp.window.float())
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + D", hl.dsp.layout("togglesplit"))
 
-hl.bind("Escape", hl.dsp.exec_cmd([=[bash -c '[[ $(hyprctl activewindow -j | jq -r ".class") == "ephemeral-kitty" ]] && pypr hide ephemeral-kitty']=]), { non_consuming = true })
+hl.bind("Escape", function()
+  local window = hl.get_active_window()
+  if window and window.class == "ephemeral-kitty" then hl.exec_cmd("pypr hide ephemeral-kitty") end
+end, { non_consuming = true })
 
-hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("bash -c 'pidof gtklock >/dev/null || gtklock -d -f; systemctl suspend'"), { locked = true })
+hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("pidof gtklock >/dev/null || gtklock -d -f"), { locked = true })
 
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_SINK@ 0; wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_SINK@ 0; wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true })
-hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true, repeating = true })
-hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true, repeating = true })
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ 0; wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ 0; wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true })
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })
+hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true })
 
 hl.bind("XF86Explorer", hl.dsp.exec_cmd("~/.scripts/brightness/brightness.sh -5"), { locked = true, repeating = true }) -- F1 Feker IK75
 hl.bind("XF86HomePage", hl.dsp.exec_cmd("~/.scripts/brightness/brightness.sh +5"), { locked = true, repeating = true }) -- F2 Feker IK75
@@ -65,8 +68,8 @@ hl.bind("mouse:275", hl.dsp.workspace.toggle_special("home-assistant"), { releas
 -- Workspaces
 for i = 1, smw.get_amount_of_workspaces() do
   local n = tostring(i)
-  hl.bind(mainMod .. " +" .. n, smw.workspace(n))
-  hl.bind(mainMod .. " + SHIFT +" .. n, smw.move_to_workspace_silent(n))
+  hl.bind(mainMod .. " + " .. n, smw.workspace(n))
+  hl.bind(mainModShift .. " + " .. n, smw.move_to_workspace_silent(n))
 end
 
 hl.bind(mainMod .. " + mouse_down", smw.cycle_workspaces("prev"))
