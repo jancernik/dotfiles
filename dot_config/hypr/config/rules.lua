@@ -1,6 +1,6 @@
 hl.workspace_rule({
   workspace = "special:home-assistant",
-  on_created_empty = "chromium --new-window --app=https://home.cuasar.cc",
+  on_created_empty = HomeAssistant,
 })
 
 hl.window_rule({

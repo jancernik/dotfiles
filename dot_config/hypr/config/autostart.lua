@@ -4,7 +4,7 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("pypr")
   hl.exec_cmd("kdeconnectd")
   hl.exec_cmd("awww-daemon")
-  hl.exec_cmd("chromium --new-window --app=https://home.cuasar.cc")
+  hl.exec_cmd(HomeAssistant)
   hl.exec_cmd(Whatsapp)
 
   hl.exec_cmd("uwsm app -- ~/.scripts/focus-guard.sh")

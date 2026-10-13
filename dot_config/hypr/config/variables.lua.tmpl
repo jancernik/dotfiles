@@ -5,7 +5,11 @@ Menu = "vicinae toggle"
 Emojis = "vicinae vicinae://launch/core/search-emojis"
 Clipboard = "vicinae vicinae://launch/clipboard/history"
 Browser = "brave"
+WorkBrowser = "brave --profile-directory=\"Profile 1\""
 Whatsapp = "brave --profile-directory=Default --new-window --app=https://web.whatsapp.com"
+HomeAssistant = "chromium --new-window --app=https://home.cuasar.cc"
+Lock = "pidof gtklock >/dev/null || gtklock -d -f"
+ColorPicker = "hyprpicker --autocopy"
 Obsidian = "obsidian --disable-gpu --ozone-platform-hint=wayland"
 
 {{ if eq .chezmoi.hostname "arch-desktop" -}}
