@@ -7,7 +7,7 @@ hl.bind(mainModShift .. " + Return", hl.dsp.exec_cmd(EphemeralTerminal))
 hl.bind(mainMod .. " + Space", hl.dsp.exec_cmd(Menu))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(Files))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd(Browser))
-hl.bind(mainMod .. " + ALT + W", hl.dsp.exec_cmd(WorkBrowser))
+hl.bind(mainModShift .. " + W", hl.dsp.exec_cmd(WorkBrowser))
 hl.bind(mainMod .. " + O", hl.dsp.exec_cmd(Obsidian))
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd(ColorPicker))
 hl.bind(mainModShift .. " + L", function()
@@ -67,7 +67,7 @@ hl.bind(mainModShift .. " + B", hl.dsp.global("quickshell:barToggle"))
 
 hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("home-assistant"))
 hl.bind("mouse:275", hl.dsp.workspace.toggle_special("home-assistant"), { release = true })
-hl.bind(mainModShift .. " + W", hl.dsp.workspace.toggle_special("whatsapp"))
+hl.bind(mainMod .. " + A", hl.dsp.workspace.toggle_special("whatsapp"))
 hl.bind("mouse:276", hl.dsp.workspace.toggle_special("whatsapp"), { release = true })
 
 -- Workspaces
