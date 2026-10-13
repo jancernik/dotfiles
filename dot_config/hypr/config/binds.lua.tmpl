@@ -9,7 +9,6 @@ hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(Files))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd(Browser))
 hl.bind(mainMod .. " + O", hl.dsp.exec_cmd(Obsidian))
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("hyprpicker --autocopy"))
-hl.bind(mainModShift .. " + W", hl.dsp.exec_cmd(Whatsapp))
 hl.bind(mainModShift .. " + L", hl.dsp.exec_cmd("bash -c 'hyprctl dispatch \"hl.dsp.focus({ monitor = \\\"" .. MainMonitor .. "\\\" })\"; pidof gtklock || gtklock -d -f'"))
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd(Clipboard))
 hl.bind(mainMod .. " + code:60", hl.dsp.exec_cmd(Emojis))
@@ -64,6 +63,8 @@ hl.bind(mainModShift .. " + B", hl.dsp.global("quickshell:barToggle"))
 
 hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("home-assistant"))
 hl.bind("mouse:275", hl.dsp.workspace.toggle_special("home-assistant"), { release = true })
+hl.bind(mainModShift .. " + W", hl.dsp.workspace.toggle_special("whatsapp"))
+hl.bind("mouse:276", hl.dsp.workspace.toggle_special("whatsapp"), { release = true })
 
 -- Workspaces
 for i = 1, smw.get_amount_of_workspaces() do

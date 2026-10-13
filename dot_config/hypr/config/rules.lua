@@ -9,6 +9,17 @@ hl.window_rule({
   no_initial_focus = true,
 })
 
+hl.workspace_rule({
+  workspace = "special:whatsapp",
+  on_created_empty = Whatsapp,
+})
+
+hl.window_rule({
+  match = { class = "^(brave-web\\.whatsapp\\.com__-Default)$" },
+  workspace = "special:whatsapp silent",
+  no_initial_focus = true,
+})
+
 hl.window_rule({
   match = { class = "^(puppeteer-browser)$" },
   workspace = "1 silent",
