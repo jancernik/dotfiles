@@ -40,3 +40,31 @@ key = "ctrl+d"
 type = "shell"
 command = ":"
 description = "ignore Ctrl+D"
+
+[[keys.command]]
+key = "prefix+M"
+type = "plugin_action"
+command = "drovr.move-tab"
+description = "move tab to workspace"
+
+[[keys.command]]
+key = "prefix+m"
+type = "plugin_action"
+command = "drovr.move-pane"
+description = "move pane to tab"
+
+[ui]
+show_agent_labels_on_pane_borders = false
+agent_panel_sort = "spaces"
+
+[ui.sidebar.agents]
+rows = [
+  ["state_icon", { token = "tab", fg = "#CCCCCC", bold = true, dim = false }],
+  [{ token = "workspace", bold = false, dim = true }, "agent"],
+]
+
+[ui.sidebar.agents.rows_by_agent]
+claude = [
+  ["state_icon", { token = "tab", fg = "#CCCCCC", bold = true, dim = false }],
+  [{ token = "workspace", bold = false, dim = true }, "agent"],
+]
