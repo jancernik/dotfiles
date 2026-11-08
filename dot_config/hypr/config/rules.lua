@@ -1,17 +1,17 @@
-hl.workspace_rule({
-  workspace = "special:home-assistant",
-  on_created_empty = HomeAssistant,
-})
+local SpecialApps = {
+  ["special:home-assistant"] = HomeAssistant,
+  ["special:whatsapp"] = Whatsapp,
+}
+
+hl.on("workspace.created", function(ws)
+  local cmd = SpecialApps[ws.name]
+  if cmd and ws.is_empty then hl.exec_cmd(cmd) end
+end)
 
 hl.window_rule({
   match = { class = "^(chrome-home\\.cuasar\\.cc__-Default)$" },
   workspace = "special:home-assistant silent",
   no_initial_focus = true,
-})
-
-hl.workspace_rule({
-  workspace = "special:whatsapp",
-  on_created_empty = Whatsapp,
 })
 
 hl.window_rule({
