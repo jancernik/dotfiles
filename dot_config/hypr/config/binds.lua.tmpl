@@ -1,10 +1,11 @@
 local mainMod = "SUPER"
 local mainModShift = "SUPER + SHIFT"
 local fullscreen = require("config/fullscreen")
+local always = { dont_inhibit = true }
 
 hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd(Terminal))
 hl.bind(mainModShift .. " + Return", hl.dsp.exec_cmd(EphemeralTerminal))
-hl.bind(mainMod .. " + Space", hl.dsp.exec_cmd(Menu))
+hl.bind(mainMod .. " + Space", hl.dsp.exec_cmd(Menu), always)
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(Files))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd(Browser))
 hl.bind(mainModShift .. " + W", hl.dsp.exec_cmd(WorkBrowser))
@@ -68,13 +69,27 @@ hl.bind(mainModShift .. " + B", hl.dsp.global("quickshell:barToggle"))
 hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("home-assistant"))
 hl.bind("mouse:275", hl.dsp.workspace.toggle_special("home-assistant"), { release = true })
 hl.bind(mainMod .. " + A", hl.dsp.workspace.toggle_special("whatsapp"))
-hl.bind("mouse:276", hl.dsp.workspace.toggle_special("whatsapp"), { release = true })
+local whatsappButton = hl.bind("mouse:276", hl.dsp.workspace.toggle_special("whatsapp"), { release = true })
+
+local GameClasses = { "cs2" }
+local function is_game(window)
+  if not window then return false end
+  if window.class == "looking-glass-client" then return false end
+  if window.content_type == "game" or window.class:match("^steam_app_") then return true end
+  for _, class in ipairs(GameClasses) do
+    if window.class == class then return true end
+  end
+  return false
+end
+hl.on("window.active", function()
+  whatsappButton:set_enabled(not is_game(hl.get_active_window()))
+end)
 
 -- Workspaces
 for i = 1, smw.get_amount_of_workspaces() do
   local n = tostring(i)
-  hl.bind(mainMod .. " + " .. n, smw.workspace(n))
-  hl.bind(mainModShift .. " + " .. n, smw.move_to_workspace_silent(n))
+  hl.bind(mainMod .. " + " .. n, smw.workspace(n), always)
+  hl.bind(mainModShift .. " + " .. n, smw.move_to_workspace_silent(n), always)
 end
 
 hl.bind(mainMod .. " + mouse_down", smw.cycle_workspaces("prev"))
